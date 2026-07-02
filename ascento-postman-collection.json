@@ -1,30 +1,94 @@
 {
   "info": {
-    "_postman_id": "f5f0b5d9-2f22-48a0-ba07-2a4b88d87a41",
-    "name": "Ascento School Management API - Comprehensive",
-    "description": "Complete collection for Ascento Backend. Features automatic token extraction on Login. Ensure you set the `base_url` variable.",
+    "name": "Ascento School Management API - Full CRUD",
+    "description": "Complete and proper collection for Ascento Backend with automated variable chaining and proper flows for Admin and Teachers.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://ascento-backend-private.onrender.com/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacher_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "branch_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "academic_year_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "class_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "section_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "subject_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacher_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "course_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "exam_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
   "item": [
     {
-      "name": "1. Auth & Onboarding",
-      "description": "Authentication endpoints. Run Login first to auto-set the Bearer token.",
+      "name": "1. Authentication",
       "item": [
         {
-          "name": "1.1 Login (Auto-sets Token)",
+          "name": "1.1 Login as Admin",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "const response = pm.response.json();",
-                  "if(response.success && response.data.session) {",
-                  "    pm.environment.set('admin_token', response.data.session.access_token);",
-                  "    pm.environment.set('refresh_token', response.data.session.refresh_token);",
-                  "    console.log('Tokens updated successfully!');",
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data.session) {",
+                  "    pm.collectionVariables.set('admin_token', res.data.session.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', res.data.session.refresh_token);",
                   "}"
-                ],
-                "type": "text/javascript"
+                ]
               }
             }
           ],
@@ -33,249 +97,1642 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"superadmin@ascento.com\",\n    \"password\": \"secure_password\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"email\": \"superadmin@ascento.com\",\n    \"password\": \"admin@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            "url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] },
-            "description": "Logs in the user and automatically saves the `access_token` into the `admin_token` Postman variable for subsequent requests."
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
           }
         },
         {
-          "name": "1.2 Get Profile (Me)",
+          "name": "1.2 Login as Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data.session) {",
+                  "    pm.collectionVariables.set('teacher_token', res.data.session.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"teacher@ascento.com\",\n    \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 Get Admin Profile",
           "request": {
             "method": "GET",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "url": { "raw": "{{base_url}}/auth/me", "host": [ "{{base_url}}" ], "path": [ "auth", "me" ] }
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.4 Get Teacher Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
           }
         }
       ]
     },
     {
-      "name": "2. Academic Setup",
-      "description": "Endpoints to set up the physical and academic structure of the school.",
+      "name": "Branches",
       "item": [
         {
-          "name": "2.1 Create Branch",
+          "name": "Create Branch",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "branches"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Mumbai Central\",\n    \"city\": \"Mumbai\",\n    \"address\": \"123 Abacus Lane\",\n    \"phone\": \"+919876543210\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/branches", "host": [ "{{base_url}}" ], "path": [ "branches" ] }
+              "raw": "{\n    \"name\": \"Main Campus\",\n    \"city\": \"Delhi\",\n    \"phone\": \"+919876543210\",\n    \"address\": \"123 School Lane\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('branch_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Branches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "branches"
+              ]
+            }
           }
         },
         {
-          "name": "2.2 Create Academic Year",
+          "name": "Get Branch By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/{{branch_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "branches",
+                "{{branch_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Branch",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/{{branch_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "branches",
+                "{{branch_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Main Campus Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Branch",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/branches/{{branch_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "branches",
+                "{{branch_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academic Years",
+      "item": [
+        {
+          "name": "Create Academic Year",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/academic-years",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "academic-years"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"2024-2025\",\n    \"start_date\": \"2024-04-01\",\n    \"end_date\": \"2025-03-31\",\n    \"is_current\": true\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/academic-years", "host": [ "{{base_url}}" ], "path": [ "academic-years" ] }
-          }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('academic_year_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "2.3 Create Class",
-          "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Level 1 (Foundation)\",\n    \"order_index\": 1\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/classes", "host": [ "{{base_url}}" ], "path": [ "classes" ] }
-          }
-        },
-        {
-          "name": "2.4 Create Section",
-          "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Batch A - Weekend\",\n    \"class_id\": \"{{class_id}}\",\n    \"max_students\": 30\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/sections", "host": [ "{{base_url}}" ], "path": [ "sections" ] }
-          }
-        }
-      ]
-    },
-    {
-      "name": "3. User Management",
-      "item": [
-        {
-          "name": "3.1 Create Student",
-          "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"role\": \"student\",\n    \"full_name\": \"Arjun Sharma\",\n    \"email\": \"arjun@example.com\",\n    \"gender\": \"male\",\n    \"section_id\": \"{{section_id}}\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"roll_number\": \"L1-001\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/admin/users", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ] }
-          }
-        },
-        {
-          "name": "3.2 List Students",
+          "name": "Get All Academic Years",
           "request": {
             "method": "GET",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "url": { "raw": "{{base_url}}/admin/users?role=student", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ], "query": [ { "key": "role", "value": "student" } ] }
-          }
-        }
-      ]
-    },
-    {
-      "name": "4. Timetable",
-      "item": [
-        {
-          "name": "4.1 Schedule Class Period",
-          "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"teacher_id\": \"{{teacher_id}}\",\n    \"day_of_week\": 6, \n    \"start_time\": \"10:00:00\",\n    \"end_time\": \"11:30:00\"\n}",
-              "options": { "raw": { "language": "json" } },
-              "description": "day_of_week: 0=Sunday, 1=Monday... 6=Saturday"
-            },
-            "url": { "raw": "{{base_url}}/timetable", "host": [ "{{base_url}}" ], "path": [ "timetable" ] }
-          }
-        }
-      ]
-    },
-    {
-      "name": "5. Courses & Content",
-      "item": [
-        {
-          "name": "5.1 Create Paid Course",
-          "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"Vedic Maths Masterclass\",\n    \"type\": \"vedic_maths\",\n    \"fee\": 5000,\n    \"duration_weeks\": 12,\n    \"status\": \"active\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/courses", "host": [ "{{base_url}}" ], "path": [ "courses" ] }
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/academic-years",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "academic-years"
+              ]
+            }
           }
         },
         {
-          "name": "5.2 Enroll Student",
+          "name": "Get Academic Year By ID",
           "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/academic-years/{{academic_year_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "academic-years",
+                "{{academic_year_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Academic Year",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/academic-years/{{academic_year_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "academic-years",
+                "{{academic_year_id}}"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"student_id\": \"{{student_id}}\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/courses/{{course_id}}/enroll", "host": [ "{{base_url}}" ], "path": [ "courses", "{{course_id}}", "enroll" ] }
+              "raw": "{\n    \"is_current\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Academic Year",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/academic-years/{{academic_year_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "academic-years",
+                "{{academic_year_id}}"
+              ]
+            }
           }
         }
       ]
     },
     {
-      "name": "6. Exams & Attendance",
+      "name": "Classes",
       "item": [
         {
-          "name": "6.1 Create Exam",
+          "name": "Create Class",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/classes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "classes"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Midterm Assessment\",\n    \"type\": \"midterm\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"class_id\": \"{{class_id}}\",\n    \"exam_date\": \"2024-10-15\",\n    \"total_marks\": 100,\n    \"passing_marks\": 40\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/exams", "host": [ "{{base_url}}" ], "path": [ "exams" ] }
+              "raw": "{\n    \"name\": \"Grade 10\",\n    \"order_index\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('class_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Classes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/classes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "classes"
+              ]
+            }
           }
         },
         {
-          "name": "6.2 Enter Exam Results",
+          "name": "Get Class By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/classes/{{class_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "classes",
+                "{{class_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Class",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/classes/{{class_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "classes",
+                "{{class_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Grade 10 - Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Class",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/classes/{{class_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "classes",
+                "{{class_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sections",
+      "item": [
+        {
+          "name": "Create Section",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sections"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Section A\",\n    \"class_id\": \"{{class_id}}\",\n    \"max_students\": 40\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('section_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sections"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Section By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/{{section_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sections",
+                "{{section_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Section",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/{{section_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sections",
+                "{{section_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"max_students\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Section",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sections/{{section_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sections",
+                "{{section_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subjects",
+      "item": [
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subjects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subjects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Mathematics\",\n    \"code\": \"MATH101\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('subject_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subjects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subjects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Subject By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subjects/{{subject_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subjects",
+                "{{subject_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Subject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subjects/{{subject_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subjects",
+                "{{subject_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"MATH101-A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/subjects/{{subject_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "subjects",
+                "{{subject_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (Teachers & Students)",
+      "item": [
+        {
+          "name": "Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"teacher\",\n    \"full_name\": \"John Doe\",\n    \"email\": \"teacher@ascento.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('teacher_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"student\",\n    \"full_name\": \"Alice Smith\",\n    \"email\": \"alice@ascento.com\",\n    \"class_id\": \"{{class_id}}\",\n    \"section_id\": \"{{section_id}}\",\n    \"academic_year_id\": \"{{academic_year_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('student_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users?role=teacher",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users?role=teacher"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users?role=student",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users?role=student"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{teacher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{teacher_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{student_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{student_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Teacher",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{teacher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{teacher_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"full_name\": \"John Doe Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Teacher",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{teacher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{teacher_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timetable",
+      "item": [
+        {
+          "name": "Create Timetable Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetable",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "timetable"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"teacher_id\": \"{{teacher_id}}\",\n    \"day_of_week\": 1,\n    \"start_time\": \"09:00:00\",\n    \"end_time\": \"09:45:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Section Timetable",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetable/section/{{section_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "timetable",
+                "section",
+                "{{section_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Teacher Timetable (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetable/teacher/{{teacher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "timetable",
+                "teacher",
+                "{{teacher_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Timetable (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetable/teacher/{{teacher_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "timetable",
+                "teacher",
+                "{{teacher_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exams",
+      "item": [
+        {
+          "name": "Create Exam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Mid Term\",\n    \"type\": \"midterm\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"class_id\": \"{{class_id}}\",\n    \"exam_date\": \"2024-10-15\",\n    \"total_marks\": 100,\n    \"passing_marks\": 40\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('exam_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Exam By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams/{{exam_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams",
+                "{{exam_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Exam",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams/{{exam_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams",
+                "{{exam_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Mid Term - Rescheduled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Exam",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams/{{exam_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams",
+                "{{exam_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exam Results",
+      "item": [
+        {
+          "name": "Add Exam Result (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams/{{exam_id}}/results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams",
+                "{{exam_id}}",
+                "results"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n    \"results\": [\n        {\n            \"student_id\": \"{{student_id}}\",\n            \"marks_obtained\": 85,\n            \"is_absent\": false,\n            \"remarks\": \"Excellent\"\n        }\n    ]\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/exams/{{exam_id}}/results", "host": [ "{{base_url}}" ], "path": [ "exams", "{{exam_id}}", "results" ] }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           }
         },
         {
-          "name": "6.3 Mark Bulk Attendance",
+          "name": "Get Exam Results",
           "request": {
-            "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"date\": \"2024-05-01\",\n    \"records\": [\n        { \"student_id\": \"{{student_id}}\", \"present\": true, \"late\": false }\n    ]\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": { "raw": "{{base_url}}/attendance/bulk", "host": [ "{{base_url}}" ], "path": [ "attendance", "bulk" ] }
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams/{{exam_id}}/results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "exams",
+                "{{exam_id}}",
+                "results"
+              ]
+            }
           }
         }
       ]
     },
     {
-      "name": "7. Payments (Razorpay)",
+      "name": "Attendance",
       "item": [
         {
-          "name": "7.1 Create Order",
+          "name": "Mark Bulk Attendance (Teacher)",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "bulk"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"amount\": 5000,\n    \"course_id\": \"{{course_id}}\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"date\": \"2024-05-01\",\n    \"records\": [\n        {\n            \"student_id\": \"{{student_id}}\",\n            \"present\": true,\n            \"late\": false\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mark Bulk Attendance (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "bulk"
+              ]
             },
-            "url": { "raw": "{{base_url}}/payments/create-order", "host": [ "{{base_url}}" ], "path": [ "payments", "create-order" ] }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"date\": \"2024-05-01\",\n    \"records\": [\n        {\n            \"student_id\": \"{{student_id}}\",\n            \"present\": true,\n            \"late\": false\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Section Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/section/{{section_id}}?date=2024-05-01",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "section",
+                "{{section_id}}?date=2024-05-01"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/student/{{student_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "attendance",
+                "student",
+                "{{student_id}}"
+              ]
+            }
           }
         }
       ]
     },
     {
-      "name": "8. AI Reports (Groq)",
+      "name": "Courses",
       "item": [
         {
-          "name": "8.1 Generate Personalized Report",
+          "name": "Create Course",
           "request": {
             "method": "POST",
-            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"student_id\": \"{{student_id}}\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"title\": \"Vedic Maths Masterclass\",\n    \"type\": \"vedic_maths\",\n    \"fee\": 5000,\n    \"duration_weeks\": 12,\n    \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if(res.success && res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('course_id', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Course By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ]
             },
-            "url": { "raw": "{{base_url}}/ai/student-report", "host": [ "{{base_url}}" ], "path": [ "ai", "student-report" ] }
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fee\": 5500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ]
+            }
           }
         }
       ]
     }
-  ],
-  "variable": [
-    { "key": "base_url", "value": "http://localhost:3000/api/v1", "type": "string" },
-    { "key": "admin_token", "value": "", "type": "string" },
-    { "key": "refresh_token", "value": "", "type": "string" },
-    { "key": "class_id", "value": "", "type": "string" },
-    { "key": "section_id", "value": "", "type": "string" },
-    { "key": "subject_id", "value": "", "type": "string" },
-    { "key": "teacher_id", "value": "", "type": "string" },
-    { "key": "student_id", "value": "", "type": "string" },
-    { "key": "academic_year_id", "value": "", "type": "string" },
-    { "key": "course_id", "value": "", "type": "string" },
-    { "key": "exam_id", "value": "", "type": "string" }
   ]
 }
