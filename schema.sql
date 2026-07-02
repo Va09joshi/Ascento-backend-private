@@ -1,3 +1,7 @@
+-- CLEANUP EXISTING SCHEMA
+DROP TABLE IF EXISTS audit_logs, bulk_import_jobs, announcements, notifications, payments, content_items, attendance, exam_schedule, exam_results, exams, timetable_periods, enrollments, courses, student_sections, class_subjects, subjects, sections, classes, academic_years, parent_student, users, branches CASCADE;
+DROP TYPE IF EXISTS user_role, course_status, payment_status, notification_type, exam_type, day_of_week, bulk_job_status CASCADE;
+
 -- ENUMS
 CREATE TYPE user_role AS ENUM ('super_admin', 'admin', 'teacher', 'student', 'parent');
 CREATE TYPE course_status AS ENUM ('active', 'inactive', 'archived');
@@ -322,3 +326,25 @@ CREATE POLICY "teacher_section_attendance" ON attendance
       WHERE s.id = attendance.section_id
     )
   );
+
+-- AUTH TRIGGER FOR AUTOMATIC USER CREATION
+-- This is the Supabase best practice for syncing auth.users with public.users
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (auth_id, email, full_name, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'New User'),
+    COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'student'::user_role)
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create the trigger on auth.users
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
