@@ -8,4 +8,14 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Service role client bypassing RLS, for admin actions
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
+
+// Create a fresh client for auth so we don't mutate the global admin client
+export const createAuthClient = () => {
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/^"|"$/g, '');
+  return createClient(supabaseUrl, anonKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+};
