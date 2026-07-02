@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "f5f0b5d9-2f22-48a0-ba07-2a4b88d87a41",
+    "name": "Ascento School Management API - Comprehensive",
+    "description": "Complete collection for Ascento Backend. Features automatic token extraction on Login. Ensure you set the `base_url` variable.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth & Onboarding",
+      "description": "Authentication endpoints. Run Login first to auto-set the Bearer token.",
+      "item": [
+        {
+          "name": "1.1 Login (Auto-sets Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if(response.success && response.data.session) {",
+                  "    pm.environment.set('admin_token', response.data.session.access_token);",
+                  "    pm.environment.set('refresh_token', response.data.session.refresh_token);",
+                  "    console.log('Tokens updated successfully!');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"superadmin@ascento.com\",\n    \"password\": \"secure_password\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] },
+            "description": "Logs in the user and automatically saves the `access_token` into the `admin_token` Postman variable for subsequent requests."
+          }
+        },
+        {
+          "name": "1.2 Get Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/me", "host": [ "{{base_url}}" ], "path": [ "auth", "me" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Academic Setup",
+      "description": "Endpoints to set up the physical and academic structure of the school.",
+      "item": [
+        {
+          "name": "2.1 Create Branch",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Mumbai Central\",\n    \"city\": \"Mumbai\",\n    \"address\": \"123 Abacus Lane\",\n    \"phone\": \"+919876543210\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/branches", "host": [ "{{base_url}}" ], "path": [ "branches" ] }
+          }
+        },
+        {
+          "name": "2.2 Create Academic Year",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2024-2025\",\n    \"start_date\": \"2024-04-01\",\n    \"end_date\": \"2025-03-31\",\n    \"is_current\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/academic-years", "host": [ "{{base_url}}" ], "path": [ "academic-years" ] }
+          }
+        },
+        {
+          "name": "2.3 Create Class",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Level 1 (Foundation)\",\n    \"order_index\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/classes", "host": [ "{{base_url}}" ], "path": [ "classes" ] }
+          }
+        },
+        {
+          "name": "2.4 Create Section",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Batch A - Weekend\",\n    \"class_id\": \"{{class_id}}\",\n    \"max_students\": 30\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/sections", "host": [ "{{base_url}}" ], "path": [ "sections" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. User Management",
+      "item": [
+        {
+          "name": "3.1 Create Student",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"student\",\n    \"full_name\": \"Arjun Sharma\",\n    \"email\": \"arjun@example.com\",\n    \"gender\": \"male\",\n    \"section_id\": \"{{section_id}}\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"roll_number\": \"L1-001\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/admin/users", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ] }
+          }
+        },
+        {
+          "name": "3.2 List Students",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/users?role=student", "host": [ "{{base_url}}" ], "path": [ "admin", "users" ], "query": [ { "key": "role", "value": "student" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Timetable",
+      "item": [
+        {
+          "name": "4.1 Schedule Class Period",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"teacher_id\": \"{{teacher_id}}\",\n    \"day_of_week\": 6, \n    \"start_time\": \"10:00:00\",\n    \"end_time\": \"11:30:00\"\n}",
+              "options": { "raw": { "language": "json" } },
+              "description": "day_of_week: 0=Sunday, 1=Monday... 6=Saturday"
+            },
+            "url": { "raw": "{{base_url}}/timetable", "host": [ "{{base_url}}" ], "path": [ "timetable" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Courses & Content",
+      "item": [
+        {
+          "name": "5.1 Create Paid Course",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Vedic Maths Masterclass\",\n    \"type\": \"vedic_maths\",\n    \"fee\": 5000,\n    \"duration_weeks\": 12,\n    \"status\": \"active\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/courses", "host": [ "{{base_url}}" ], "path": [ "courses" ] }
+          }
+        },
+        {
+          "name": "5.2 Enroll Student",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"{{student_id}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/courses/{{course_id}}/enroll", "host": [ "{{base_url}}" ], "path": [ "courses", "{{course_id}}", "enroll" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Exams & Attendance",
+      "item": [
+        {
+          "name": "6.1 Create Exam",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Midterm Assessment\",\n    \"type\": \"midterm\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"class_id\": \"{{class_id}}\",\n    \"exam_date\": \"2024-10-15\",\n    \"total_marks\": 100,\n    \"passing_marks\": 40\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/exams", "host": [ "{{base_url}}" ], "path": [ "exams" ] }
+          }
+        },
+        {
+          "name": "6.2 Enter Exam Results",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"results\": [\n        {\n            \"student_id\": \"{{student_id}}\",\n            \"marks_obtained\": 85,\n            \"is_absent\": false,\n            \"remarks\": \"Excellent\"\n        }\n    ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/exams/{{exam_id}}/results", "host": [ "{{base_url}}" ], "path": [ "exams", "{{exam_id}}", "results" ] }
+          }
+        },
+        {
+          "name": "6.3 Mark Bulk Attendance",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"section_id\": \"{{section_id}}\",\n    \"subject_id\": \"{{subject_id}}\",\n    \"date\": \"2024-05-01\",\n    \"records\": [\n        { \"student_id\": \"{{student_id}}\", \"present\": true, \"late\": false }\n    ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/attendance/bulk", "host": [ "{{base_url}}" ], "path": [ "attendance", "bulk" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Payments (Razorpay)",
+      "item": [
+        {
+          "name": "7.1 Create Order",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 5000,\n    \"course_id\": \"{{course_id}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/payments/create-order", "host": [ "{{base_url}}" ], "path": [ "payments", "create-order" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. AI Reports (Groq)",
+      "item": [
+        {
+          "name": "8.1 Generate Personalized Report",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{admin_token}}" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"{{student_id}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/ai/student-report", "host": [ "{{base_url}}" ], "path": [ "ai", "student-report" ] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "admin_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" },
+    { "key": "class_id", "value": "", "type": "string" },
+    { "key": "section_id", "value": "", "type": "string" },
+    { "key": "subject_id", "value": "", "type": "string" },
+    { "key": "teacher_id", "value": "", "type": "string" },
+    { "key": "student_id", "value": "", "type": "string" },
+    { "key": "academic_year_id", "value": "", "type": "string" },
+    { "key": "course_id", "value": "", "type": "string" },
+    { "key": "exam_id", "value": "", "type": "string" }
+  ]
+}
