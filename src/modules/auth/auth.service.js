@@ -2,7 +2,8 @@ import { supabaseAdmin, createAuthClient } from '../../config/supabase.js';
 import logger from '../../utils/logger.js';
 
 export const login = async (email, password) => {
-  const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+  const authClient = createAuthClient();
+  const { data, error } = await authClient.auth.signInWithPassword({
     email,
     password,
   });
