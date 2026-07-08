@@ -25,3 +25,8 @@ export const getStudentSummary = async (req, res, next) => {
     res.status(200).json({ success: true, data: summary });
   } catch (error) { next(error); }
 };
+
+export const getAttendanceReport = async (req, res, next) => {
+  // Stub endpoint to resolve 404s for dashboard
+  res.status(200).json({ success: true, data: [] });
+};

@@ -11,5 +11,6 @@ router.use(verifyToken);
 router.post('/bulk', requireRole('super_admin', 'admin', 'teacher'), validate(schema.markAttendanceSchema), auditMiddleware('MARK_ATTENDANCE', 'attendance'), attendanceController.markBulkAttendance);
 router.get('/sheet', requireRole('super_admin', 'admin', 'teacher'), attendanceController.getAttendanceSheet);
 router.get('/student/:id', attendanceController.getStudentSummary);
+router.get('/report', attendanceController.getAttendanceReport);
 
 export default router;

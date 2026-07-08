@@ -22,6 +22,7 @@ import examRoutes from './modules/exams/exams.routes.js';
 import attendanceRoutes from './modules/attendance/attendance.routes.js';
 import paymentRoutes from './modules/payments/payments.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
+import noticesRoutes from './modules/notices/notices.routes.js';
 
 // ... we will add them as they are created
 
@@ -63,6 +64,11 @@ app.use(`${API_PREFIX}/exams`, examRoutes);
 app.use(`${API_PREFIX}/attendance`, attendanceRoutes);
 app.use(`${API_PREFIX}/payments`, paymentRoutes);
 app.use(`${API_PREFIX}/ai`, aiRoutes);
+app.use(`${API_PREFIX}/notices`, noticesRoutes);
+
+// Mock endpoints to resolve dashboard 404s temporarily
+app.get(`${API_PREFIX}/homework`, (req, res) => res.json({ success: true, data: [] }));
+app.get(`${API_PREFIX}/billing/history`, (req, res) => res.json({ success: true, data: [] }));
 
 // 404 Handler
 app.use((req, res, next) => {

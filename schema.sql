@@ -1,5 +1,5 @@
 -- CLEANUP EXISTING SCHEMA
-DROP TABLE IF EXISTS audit_logs, bulk_import_jobs, announcements, notifications, payments, content_items, attendance, exam_schedule, exam_results, exams, timetable_periods, enrollments, courses, student_sections, class_subjects, subjects, sections, classes, academic_years, parent_student, users, branches CASCADE;
+DROP TABLE IF EXISTS audit_logs, bulk_import_jobs, announcements, notices, notifications, payments, content_items, attendance, exam_schedule, exam_results, exams, timetable_periods, enrollments, courses, student_sections, class_subjects, subjects, sections, classes, academic_years, parent_student, users, branches CASCADE;
 DROP TYPE IF EXISTS user_role, course_status, payment_status, notification_type, exam_type, day_of_week, bulk_job_status CASCADE;
 
 -- ENUMS
@@ -268,6 +268,17 @@ CREATE TABLE announcements (
   class_id UUID REFERENCES classes(id),
   section_id UUID REFERENCES sections(id),
   attachment_url TEXT,
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE notices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  banner_url TEXT,
+  type TEXT DEFAULT 'event',
+  is_published BOOLEAN DEFAULT false,
   created_by UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT now()
 );

@@ -56,7 +56,17 @@
       "type": "string"
     },
     {
+      "key": "teacher_email",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "student_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "student_email",
       "value": "",
       "type": "string"
     },
@@ -928,55 +938,34 @@
       ]
     },
     {
-      "name": "Users (Teachers & Students)",
+      "name": "Users CRUD",
       "item": [
         {
           "name": "Create Teacher",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/admin/users",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "admin",
-                "users"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"role\": \"teacher\",\n    \"full_name\": \"John Doe\",\n    \"email\": \"teacher@ascento.com\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = Date.now();",
+                  "pm.collectionVariables.set('teacher_email', `teacher-${suffix}@ascento.com`);"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
                   "const res = pm.response.json();",
-                  "if(res.success && res.data && res.data.id) {",
+                  "if (res.success && res.data && res.data.id) {",
                   "    pm.collectionVariables.set('teacher_id', res.data.id);",
                   "}"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Create Student",
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -997,28 +986,91 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"role\": \"student\",\n    \"full_name\": \"Alice Smith\",\n    \"email\": \"alice@ascento.com\",\n    \"class_id\": \"{{class_id}}\",\n    \"section_id\": \"{{section_id}}\",\n    \"academic_year_id\": \"{{academic_year_id}}\"\n}",
+              "raw": "{\n    \"role\": \"teacher\",\n    \"full_name\": \"John Doe\",\n    \"email\": \"{{teacher_email}}\",\n    \"phone\": \"+919876543210\",\n    \"branch_id\": \"{{branch_id}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             }
-          },
+          }
+        },
+        {
+          "name": "Create Student",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = Date.now();",
+                  "pm.collectionVariables.set('student_email', `student-${suffix}@ascento.com`);"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
                   "const res = pm.response.json();",
-                  "if(res.success && res.data && res.data.id) {",
+                  "if (res.success && res.data && res.data.id) {",
                   "    pm.collectionVariables.set('student_id', res.data.id);",
                   "}"
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"student\",\n    \"full_name\": \"Alice Smith\",\n    \"email\": \"{{student_email}}\",\n    \"phone\": \"+919876543211\",\n    \"branch_id\": \"{{branch_id}}\",\n    \"class_id\": \"{{class_id}}\",\n    \"section_id\": \"{{section_id}}\",\n    \"academic_year_id\": \"{{academic_year_id}}\",\n    \"roll_number\": \"A-101\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            }
+          }
         },
         {
           "name": "Get All Teachers",
@@ -1037,7 +1089,13 @@
               ],
               "path": [
                 "admin",
-                "users?role=teacher"
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "teacher"
+                }
               ]
             }
           }
@@ -1059,7 +1117,13 @@
               ],
               "path": [
                 "admin",
-                "users?role=student"
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "student"
+                }
               ]
             }
           }
@@ -1143,6 +1207,38 @@
           }
         },
         {
+          "name": "Update Student",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{student_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{student_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"full_name\": \"Alice Smith Updated\",\n    \"phone\": \"+919876543299\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Delete Teacher",
           "request": {
             "method": "DELETE",
@@ -1161,6 +1257,29 @@
                 "admin",
                 "users",
                 "{{teacher_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{student_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{student_id}}"
               ]
             }
           }
@@ -1728,6 +1847,114 @@
               "path": [
                 "courses",
                 "{{course_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notices & Announcements",
+      "item": [
+        {
+          "name": "Create Notice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"New Notice\",\"content\":\"Content here\",\"banner_url\":\"\",\"type\":\"event\",\"is_published\":true}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notices",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Notices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notices",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notices"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Published Notices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notices?published=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notices"
+              ],
+              "query": [
+                {
+                  "key": "published",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Notice",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"is_published\":false}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notices/{{notice_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notices",
+                "{{notice_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Notice",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/notices/{{notice_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notices",
+                "{{notice_id}}"
               ]
             }
           }
