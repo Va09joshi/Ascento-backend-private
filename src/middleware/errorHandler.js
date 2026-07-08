@@ -1,7 +1,25 @@
 import logger from '../utils/logger.js';
 
+export class AppError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+    this.name = 'AppError';
+  }
+}
+
 export const errorHandler = (err, req, res, next) => {
   logger.error(`${err.name}: ${err.message}`, { stack: err.stack, path: req.path, method: req.method });
+
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      error: {
+        code: 'APP_ERROR',
+        message: err.message,
+      },
+    });
+  }
 
   if (err.name === 'ValidationError' || err.name === 'ZodError') {
     return res.status(400).json({
