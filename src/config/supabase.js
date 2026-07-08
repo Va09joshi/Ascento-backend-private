@@ -14,7 +14,7 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 
 // Create a fresh client for auth so we don't mutate the global admin client
 export const createAuthClient = () => {
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/^"|"$/g, '');
+  const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)?.replace(/^"|"$/g, '');
   return createClient(supabaseUrl, anonKey, {
     auth: { autoRefreshToken: false, persistSession: false }
   });
