@@ -47,3 +47,12 @@ export const setCurrentAcademicYear = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteAcademicYear = async (req, res, next) => {
+  try {
+    await academicService.deleteAcademicYear(req.params.id);
+    res.status(200).json({ success: true, message: 'Academic year deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};

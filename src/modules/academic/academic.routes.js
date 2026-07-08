@@ -35,4 +35,11 @@ router.post(
   academicController.setCurrentAcademicYear
 );
 
+router.delete(
+  '/:id',
+  requireRole('super_admin', 'admin'),
+  auditMiddleware('DELETE_ACADEMIC_YEAR', 'academic_years'),
+  academicController.deleteAcademicYear
+);
+
 export default router;

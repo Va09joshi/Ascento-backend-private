@@ -71,3 +71,12 @@ export const setCurrentAcademicYear = async (id) => {
   if (error) throw new Error(error.message);
   return academicYear;
 };
+
+export const deleteAcademicYear = async (id) => {
+  const { error } = await supabaseAdmin
+    .from('academic_years')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw new Error(error.message);
+};
