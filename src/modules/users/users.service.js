@@ -2,6 +2,8 @@ import { supabaseAdmin } from '../../config/supabase.js';
 import { generateSecurePassword } from '../../utils/passwordGenerator.js';
 // import { emailQueue } from '../../jobs/emailQueue.js'; // Will implement queue later
 
+import { AppError } from '../../middleware/errorHandler.js';
+
 export const createUser = async (data) => {
   const tempPassword = generateSecurePassword();
 
@@ -12,7 +14,7 @@ export const createUser = async (data) => {
     email_confirm: true,
   });
 
-  if (authError) throw new Error(authError.message);
+  if (authError) throw new AppError(authError.message, 400);
 
   // 2. Insert into users table
   const { data: user, error: dbError } = await supabaseAdmin.from('users').insert({
@@ -28,7 +30,7 @@ export const createUser = async (data) => {
     created_by: data.created_by,
   }).select().single();
 
-  if (dbError) throw new Error(dbError.message);
+  if (dbError) throw new AppError(dbError.message, 400);
 
   // 3. Assign to section if student
   if (data.role === 'student' && data.section_id) {
