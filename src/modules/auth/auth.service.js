@@ -2,6 +2,10 @@ import { supabaseAdmin, createAuthClient } from '../../config/supabase.js';
 import logger from '../../utils/logger.js';
 
 export const login = async (email, password) => {
+  if (!process.env.SUPABASE_ANON_KEY && !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error('BACKEND_CONFIG_ERROR: The SUPABASE_ANON_KEY environment variable is absolutely missing on the server. Please add it to Render.');
+  }
+
   const authClient = createAuthClient();
   const { data, error } = await authClient.auth.signInWithPassword({
     email,
@@ -9,7 +13,7 @@ export const login = async (email, password) => {
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(`SUPABASE_AUTH_ERROR: ${error.message} (Key used: ${(process.env.SUPABASE_ANON_KEY || '').substring(0, 5)}...)`);
   }
 
   // Fetch custom user details
