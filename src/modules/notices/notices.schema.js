@@ -1,17 +1,21 @@
-import Joi from 'joi';
+import { z } from 'zod';
 
-export const createNoticeSchema = Joi.object({
-  title: Joi.string().required(),
-  content: Joi.string().required(),
-  banner_url: Joi.string().uri().allow('', null).optional(),
-  type: Joi.string().valid('event', 'news', 'update', 'alert').optional(),
-  is_published: Joi.boolean().optional()
+export const createNoticeSchema = z.object({
+  body: z.object({
+    title: z.string().min(1, 'Title is required'),
+    content: z.string().min(1, 'Content is required'),
+    banner_url: z.string().url().or(z.literal('')).nullable().optional(),
+    type: z.enum(['event', 'news', 'update', 'alert']).optional(),
+    is_published: z.boolean().optional(),
+  }),
 });
 
-export const updateNoticeSchema = Joi.object({
-  title: Joi.string().optional(),
-  content: Joi.string().optional(),
-  banner_url: Joi.string().uri().allow('', null).optional(),
-  type: Joi.string().valid('event', 'news', 'update', 'alert').optional(),
-  is_published: Joi.boolean().optional()
+export const updateNoticeSchema = z.object({
+  body: z.object({
+    title: z.string().optional(),
+    content: z.string().optional(),
+    banner_url: z.string().url().or(z.literal('')).nullable().optional(),
+    type: z.enum(['event', 'news', 'update', 'alert']).optional(),
+    is_published: z.boolean().optional(),
+  }),
 });
