@@ -2,7 +2,7 @@ import * as noticesService from './notices.service.js';
 
 export const createNotice = async (req, res, next) => {
   try {
-    const notice = await noticesService.createNotice(req.body, req.user.auth_id);
+    const notice = await noticesService.createNotice(req.body, req.file, req.user.auth_id);
     res.status(201).json({ status: 'success', data: notice });
   } catch (error) {
     next(error);
@@ -30,7 +30,7 @@ export const getNoticeById = async (req, res, next) => {
 
 export const updateNotice = async (req, res, next) => {
   try {
-    const notice = await noticesService.updateNotice(req.params.id, req.body);
+    const notice = await noticesService.updateNotice(req.params.id, req.body, req.file);
     res.status(200).json({ status: 'success', data: notice });
   } catch (error) {
     next(error);

@@ -1,8 +1,35 @@
 import { supabaseAdmin as supabase } from '../../config/supabase.js';
 import { AppError } from '../../middleware/errorHandler.js';
+import crypto from 'crypto';
 
-export const createNotice = async (noticeData, authId) => {
-  const payload = { ...noticeData, created_by: authId };
+const uploadNoticeImage = async (file) => {
+  const fileExt = file.originalname.split('.').pop();
+  const fileName = `${crypto.randomUUID()}.${fileExt}`;
+  const filePath = `notices/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(process.env.SUPABASE_STORAGE_BUCKET)
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+    });
+
+  if (uploadError) throw new AppError(uploadError.message, 500);
+
+  const { data: publicUrlData } = supabase.storage
+    .from(process.env.SUPABASE_STORAGE_BUCKET)
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+};
+
+export const createNotice = async (noticeData, file, authId) => {
+  let banner_url = noticeData.banner_url;
+
+  if (file) {
+    banner_url = await uploadNoticeImage(file);
+  }
+
+  const payload = { ...noticeData, banner_url, created_by: authId };
 
   const { data, error } = await supabase
     .from('notices')
@@ -37,10 +64,21 @@ export const getNoticeById = async (id) => {
   return data;
 };
 
-export const updateNotice = async (id, updateData) => {
+export const updateNotice = async (id, updateData, file) => {
+  let banner_url = updateData.banner_url;
+
+  if (file) {
+    banner_url = await uploadNoticeImage(file);
+  }
+
+  const payload = { ...updateData };
+  if (banner_url !== undefined) {
+    payload.banner_url = banner_url;
+  }
+
   const { data, error } = await supabase
     .from('notices')
-    .update(updateData)
+    .update(payload)
     .eq('id', id)
     .select()
     .single();
