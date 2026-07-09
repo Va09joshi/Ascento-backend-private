@@ -22,14 +22,14 @@ const uploadNoticeImage = async (file) => {
   return publicUrlData.publicUrl;
 };
 
-export const createNotice = async (noticeData, file, authId) => {
+export const createNotice = async (noticeData, file, userId) => {
   let banner_url = noticeData.banner_url;
 
   if (file) {
     banner_url = await uploadNoticeImage(file);
   }
 
-  const payload = { ...noticeData, banner_url, created_by: authId };
+  const payload = { ...noticeData, banner_url, created_by: userId };
 
   const { data, error } = await supabase
     .from('notices')
