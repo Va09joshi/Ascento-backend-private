@@ -2,7 +2,7 @@ import * as noticesService from './notices.service.js';
 
 export const createNotice = async (req, res, next) => {
   try {
-    const notice = await noticesService.createNotice(req.body, req.user.id);
+    const notice = await noticesService.createNotice(req.body, req.user.auth_id);
     res.status(201).json({ status: 'success', data: notice });
   } catch (error) {
     next(error);

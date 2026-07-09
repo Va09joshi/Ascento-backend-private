@@ -1,10 +1,12 @@
 import { supabaseAdmin as supabase } from '../../config/supabase.js';
 import { AppError } from '../../middleware/errorHandler.js';
 
-export const createNotice = async (noticeData, userId) => {
+export const createNotice = async (noticeData, authId) => {
+  const payload = { ...noticeData, created_by: authId };
+
   const { data, error } = await supabase
     .from('notices')
-    .insert([{ ...noticeData, created_by: userId }])
+    .insert([payload])
     .select()
     .single();
 

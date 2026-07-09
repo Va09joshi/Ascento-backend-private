@@ -16,8 +16,8 @@ export const createUser = async (data) => {
 
   if (authError) throw new AppError(authError.message, 400);
 
-  // 2. Insert into users table
-  const { data: user, error: dbError } = await supabaseAdmin.from('users').insert({
+  // 2. Update users table (trigger creates initial row)
+  const { data: user, error: dbError } = await supabaseAdmin.from('users').update({
     auth_id: authUser.user.id,
     role: data.role,
     full_name: data.full_name,
@@ -28,7 +28,7 @@ export const createUser = async (data) => {
     gender: data.gender,
     must_change_password: true,
     created_by: data.created_by,
-  }).select().single();
+  }).eq('auth_id', authUser.user.id).select().single();
 
   if (dbError) throw new AppError(dbError.message, 400);
 
