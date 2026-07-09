@@ -12,9 +12,18 @@ CREATE TYPE day_of_week AS ENUM ('monday', 'tuesday', 'wednesday', 'thursday', '
 CREATE TYPE bulk_job_status AS ENUM ('queued', 'processing', 'done', 'failed');
 
 -- CORE ENTITIES
+CREATE TABLE domains (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 CREATE TABLE branches (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
+  domain_id UUID REFERENCES domains(id),
   city TEXT,
   address TEXT,
   phone TEXT,
@@ -32,6 +41,8 @@ CREATE TABLE users (
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
   avatar_url TEXT,
+  profile_image_url TEXT,
+  domain_id UUID REFERENCES domains(id),
   branch_id UUID REFERENCES branches(id),
   date_of_birth DATE,
   gender TEXT CHECK (gender IN ('male', 'female', 'other')),
@@ -245,6 +256,38 @@ CREATE TABLE payments (
   receipt TEXT,
   notes TEXT,
   paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE fee_structures (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  domain_id UUID REFERENCES domains(id),
+  class_id UUID REFERENCES classes(id),
+  amount NUMERIC(10,2) NOT NULL,
+  description TEXT,
+  frequency TEXT CHECK (frequency IN ('monthly', 'quarterly', 'yearly', 'one-time')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE fee_records (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id UUID REFERENCES users(id),
+  fee_structure_id UUID REFERENCES fee_structures(id),
+  amount_due NUMERIC(10,2) NOT NULL,
+  amount_paid NUMERIC(10,2) DEFAULT 0,
+  due_date DATE,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'partial', 'paid', 'overdue')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE enquiries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  message TEXT,
+  domain_id UUID REFERENCES domains(id),
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'in_progress', 'converted', 'closed')),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

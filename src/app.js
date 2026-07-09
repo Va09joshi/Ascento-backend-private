@@ -24,8 +24,9 @@ import paymentRoutes from './modules/payments/payments.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
 import noticesRoutes from './modules/notices/notices.routes.js';
 
-// ... we will add them as they are created
-
+import domainsRoutes from './modules/domains/domains.routes.js';
+import enquiriesRoutes from './modules/enquiries/enquiries.routes.js';
+import feesRoutes from './modules/fees/fees.routes.js';
 const app = express();
 
 // Security and utility middlewares
@@ -65,6 +66,9 @@ app.use(`${API_PREFIX}/attendance`, attendanceRoutes);
 app.use(`${API_PREFIX}/payments`, paymentRoutes);
 app.use(`${API_PREFIX}/ai`, aiRoutes);
 app.use(`${API_PREFIX}/notices`, noticesRoutes);
+app.use(`${API_PREFIX}/domains`, domainsRoutes);
+app.use(`${API_PREFIX}/enquiries`, enquiriesRoutes);
+app.use(`${API_PREFIX}/fees`, feesRoutes);
 
 // Mock endpoints to resolve dashboard 404s temporarily
 app.get(`${API_PREFIX}/homework`, (req, res) => res.json({ success: true, data: [] }));
