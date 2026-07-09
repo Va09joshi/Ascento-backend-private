@@ -1,0 +1,1 @@
+﻿import 'dotenv/config'; import { supabaseAdmin } from './src/config/supabase.js'; async function run() { const { data, error } = await supabaseAdmin.from('timetable_periods').select('*, subjects(name, code), users(full_name)').limit(1); console.log(JSON.stringify(data, null, 2)); } run();

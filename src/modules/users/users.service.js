@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '../../config/supabase.js';
 import { generateSecurePassword } from '../../utils/passwordGenerator.js';
-// import { emailQueue } from '../../jobs/emailQueue.js'; // Will implement queue later
+import { sendWelcomeEmail } from '../../utils/emailService.js';
 import crypto from 'crypto';
 
 import { AppError } from '../../middleware/errorHandler.js';
@@ -79,8 +79,13 @@ export const createUser = async (data, file) => {
     });
   }
 
-  // Queue email (mocked for now, will connect to bullmq)
-  // await emailQueue.add('welcome', { email: data.email, tempPassword });
+  // Send welcome email with temp password
+  try {
+    await sendWelcomeEmail(data.email, tempPassword, data.full_name);
+  } catch (emailError) {
+    // We log the error but don't fail the user creation
+    console.error('Failed to send welcome email:', emailError);
+  }
 
   return { user, tempPassword };
 };
