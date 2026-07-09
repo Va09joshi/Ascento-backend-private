@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { logger } from './logger.js';
+import logger from './logger.js';
 
 // Setup transporter with basic SMTP. 
 // In production, these should be configured in .env
