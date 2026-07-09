@@ -24,6 +24,7 @@ export const createUser = async (data) => {
     email: data.email,
     phone: data.phone,
     branch_id: data.branch_id,
+    domain_id: data.domain_id,
     date_of_birth: data.date_of_birth,
     gender: data.gender,
     must_change_password: true,
@@ -61,7 +62,11 @@ export const listUsers = async (filters) => {
 
   if (filters.role) query = query.eq('role', filters.role);
   if (filters.branch_id) query = query.eq('branch_id', filters.branch_id);
-  if (filters.is_active !== undefined) query = query.eq('is_active', filters.is_active);
+  if (filters.is_active !== undefined) {
+    query = query.eq('is_active', filters.is_active);
+  } else {
+    query = query.eq('is_active', true);
+  }
 
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) throw new Error(error.message);

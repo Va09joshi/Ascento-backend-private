@@ -16,6 +16,7 @@ export const createUserSchema = z.object({
     academic_year_id: z.string().uuid().optional(),
     roll_number: z.string().optional(),
     parent_id: z.string().uuid().optional(),
+    domain_id: z.string().uuid().optional(),
   }),
 });
 
@@ -24,6 +25,7 @@ export const updateUserSchema = z.object({
     full_name: z.string().optional(),
     phone: z.string().optional(),
     branch_id: z.string().uuid().optional(),
+    domain_id: z.string().uuid().optional(),
     is_active: z.boolean().optional(),
   }),
 });
