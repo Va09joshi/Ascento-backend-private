@@ -9,6 +9,7 @@ export const createUserSchema = z.object({
     branch_id: z.string().uuid().optional(),
     date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     gender: z.enum(['male', 'female', 'other']).optional(),
+    avatar_url: z.string().url().optional(),
     
     // For students
     class_id: z.string().uuid().optional(),
@@ -23,7 +24,12 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   body: z.object({
     full_name: z.string().optional(),
+    email: z.string().email('Invalid email address').optional(),
     phone: z.string().optional(),
+    gender: z.enum(['male', 'female', 'other']).optional(),
+    date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    address: z.string().optional(),
+    avatar_url: z.string().url().optional(),
     branch_id: z.string().uuid().optional(),
     domain_id: z.string().uuid().optional(),
     is_active: z.boolean().optional(),

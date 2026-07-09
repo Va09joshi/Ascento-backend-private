@@ -2,8 +2,7 @@ import * as userService from './users.service.js';
 
 export const createUser = async (req, res, next) => {
   try {
-    const data = { ...req.body, created_by: req.user.id };
-    const { user, tempPassword } = await userService.createUser(data);
+    const { user, tempPassword } = await userService.createUser({ ...req.body, created_by: req.user.id }, req.file);
     
     // In production, we wouldn't return the temp password if email works
     // but useful for debugging if email queue isn't active
@@ -37,7 +36,7 @@ export const getUserById = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const user = await userService.updateUser(req.params.id, req.body);
+    const user = await userService.updateUser(req.params.id, req.body, req.file);
     res.status(200).json({ success: true, data: user, message: 'User updated successfully' });
   } catch (error) {
     next(error);

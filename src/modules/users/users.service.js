@@ -1,11 +1,37 @@
 import { supabaseAdmin } from '../../config/supabase.js';
 import { generateSecurePassword } from '../../utils/passwordGenerator.js';
 // import { emailQueue } from '../../jobs/emailQueue.js'; // Will implement queue later
+import crypto from 'crypto';
 
 import { AppError } from '../../middleware/errorHandler.js';
 
-export const createUser = async (data) => {
+const uploadUserAvatar = async (file) => {
+  const fileExt = file.originalname.split('.').pop();
+  const fileName = `${crypto.randomUUID()}.${fileExt}`;
+  const filePath = `avatars/${fileName}`;
+
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(process.env.SUPABASE_STORAGE_BUCKET)
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+    });
+
+  if (uploadError) throw new AppError(uploadError.message, 500);
+
+  const { data: publicUrlData } = supabaseAdmin.storage
+    .from(process.env.SUPABASE_STORAGE_BUCKET)
+    .getPublicUrl(filePath);
+
+  return publicUrlData.publicUrl;
+};
+
+export const createUser = async (data, file) => {
   const tempPassword = generateSecurePassword();
+
+  let avatar_url = data.avatar_url;
+  if (file) {
+    avatar_url = await uploadUserAvatar(file);
+  }
 
   // 1. Create in Supabase Auth
   const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -27,6 +53,8 @@ export const createUser = async (data) => {
     domain_id: data.domain_id,
     date_of_birth: data.date_of_birth,
     gender: data.gender,
+    address: data.address,
+    avatar_url: avatar_url,
     must_change_password: true,
     created_by: data.created_by,
   }).eq('auth_id', authUser.user.id).select().single();
@@ -85,10 +113,21 @@ export const getUserById = async (id) => {
   return data;
 };
 
-export const updateUser = async (id, data) => {
+export const updateUser = async (id, data, file) => {
+  let avatar_url = data.avatar_url;
+  
+  if (file) {
+    avatar_url = await uploadUserAvatar(file);
+  }
+
+  const payload = { ...data };
+  if (avatar_url) {
+    payload.avatar_url = avatar_url;
+  }
+
   const { data: user, error } = await supabaseAdmin
     .from('users')
-    .update(data)
+    .update(payload)
     .eq('id', id)
     .select()
     .single();
