@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Ascento Student API",
-    "description": "API collection for Student access containing Homework, Content, Timetable, and Meetings.",
+    "name": "Ascento Student API (Full)",
+    "description": "Comprehensive API collection for all student-facing features in Ascento Abacus.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -18,7 +18,115 @@
   ],
   "item": [
     {
-      "name": "Homework",
+      "name": "Authentication & Profile",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academics",
+      "item": [
+        {
+          "name": "Get Timetable",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/timetable?class_id=CLASS_ID",
+              "host": ["{{base_url}}"],
+              "path": ["timetable"],
+              "query": [
+                { "key": "class_id", "value": "CLASS_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Exams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/exams?class_id=CLASS_ID",
+              "host": ["{{base_url}}"],
+              "path": ["exams"],
+              "query": [
+                { "key": "class_id", "value": "CLASS_ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Notices (Announcements)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications?target_role=student",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "target_role", "value": "student" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Homework & Content",
       "item": [
         {
           "name": "Get Homeworks",
@@ -32,17 +140,10 @@
             ],
             "url": {
               "raw": "{{base_url}}/homework?class_id=CLASS_ID",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "homework"
-              ],
+              "host": ["{{base_url}}"],
+              "path": ["homework"],
               "query": [
-                {
-                  "key": "class_id",
-                  "value": "CLASS_ID"
-                }
+                { "key": "class_id", "value": "CLASS_ID" }
               ]
             }
           }
@@ -67,56 +168,13 @@
             },
             "url": {
               "raw": "{{base_url}}/homework/HOMEWORK_ID/submit",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "homework",
-                "HOMEWORK_ID",
-                "submit"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["homework", "HOMEWORK_ID", "submit"]
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "Meetings",
-      "item": [
+        },
         {
-          "name": "Get Meetings",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/meetings?class_id=CLASS_ID",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "meetings"
-              ],
-              "query": [
-                {
-                  "key": "class_id",
-                  "value": "CLASS_ID"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Content (Notes)",
-      "item": [
-        {
-          "name": "Get Content",
+          "name": "Get Content (Notes/PDFs)",
           "request": {
             "method": "GET",
             "header": [
@@ -127,18 +185,92 @@
             ],
             "url": {
               "raw": "{{base_url}}/content?class_id=CLASS_ID",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "content"
-              ],
+              "host": ["{{base_url}}"],
+              "path": ["content"],
               "query": [
-                {
-                  "key": "class_id",
-                  "value": "CLASS_ID"
-                }
+                { "key": "class_id", "value": "CLASS_ID" }
               ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live Meetings",
+      "item": [
+        {
+          "name": "Get Live Meetings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/meetings?class_id=CLASS_ID",
+              "host": ["{{base_url}}"],
+              "path": ["meetings"],
+              "query": [
+                { "key": "class_id", "value": "CLASS_ID" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance & Fees",
+      "item": [
+        {
+          "name": "Get My Attendance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance",
+              "host": ["{{base_url}}"],
+              "path": ["attendance"]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Fees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/billing/fees",
+              "host": ["{{base_url}}"],
+              "path": ["billing", "fees"]
+            }
+          }
+        },
+        {
+          "name": "Get Fee History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/billing/history",
+              "host": ["{{base_url}}"],
+              "path": ["billing", "history"]
             }
           }
         }
