@@ -42,8 +42,9 @@ export const createUser = async (data, file) => {
   }
 
   // 1. Create in Supabase Auth
+  const authEmail = data.email || `student_${Date.now()}@ascento.local`;
   const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-    email: data.email,
+    email: authEmail,
     password: tempPassword,
     email_confirm: true,
   });
@@ -55,7 +56,7 @@ export const createUser = async (data, file) => {
     auth_id: authUser.user.id,
     role: data.role,
     full_name: data.full_name,
-    email: data.email,
+    email: data.email || null,
     phone: data.phone,
     branch_id: data.branch_id,
     domain_id: data.domain_id,

@@ -4,7 +4,7 @@ export const createUserSchema = z.object({
   body: z.object({
     role: z.enum(['admin', 'teacher', 'student', 'parent']),
     full_name: z.string().min(1, 'Full name is required'),
-    email: z.string().email('Invalid email address'),
+    email: z.string().email('Invalid email address').optional(),
     phone: z.string().optional(),
     branch_id: z.string().uuid().optional(),
     date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -17,6 +17,9 @@ export const createUserSchema = z.object({
     academic_year_id: z.string().uuid().optional(),
     roll_number: z.string().optional(),
     parent_id: z.string().uuid().optional(),
+    parent_name: z.string().optional(),
+    parent_email: z.string().email('Invalid parent email').optional(),
+    parent_phone: z.string().optional(),
     domain_id: z.string().uuid().optional(),
   }),
 });
