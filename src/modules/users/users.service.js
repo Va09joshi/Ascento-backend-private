@@ -56,7 +56,7 @@ export const createUser = async (data, file) => {
     auth_id: authUser.user.id,
     role: data.role,
     full_name: data.full_name,
-    email: data.email || null,
+    email: authEmail,
     phone: data.phone,
     branch_id: data.branch_id,
     domain_id: data.domain_id,
