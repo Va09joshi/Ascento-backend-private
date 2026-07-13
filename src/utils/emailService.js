@@ -1,7 +1,15 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import logger from './logger.js';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER, 
+    pass: process.env.SMTP_PASS, 
+  },
+});
 
 export const sendWelcomeEmail = async (email, tempPassword, name) => {
   if (email.endsWith('@ascento.local')) {
@@ -9,7 +17,12 @@ export const sendWelcomeEmail = async (email, tempPassword, name) => {
     return { success: true, mocked: true };
   }
 
-  const htmlContent = `
+  const mailOptions = {
+    from: `"Ascento Abacus" <${process.env.SMTP_FROM || 'no-reply@ascento.com'}>`,
+    to: email,
+    subject: 'Welcome to Ascento Abacus!',
+    text: `Hello ${name || 'Student'},\n\nWelcome to Ascento Abacus! Your account has been created successfully.\n\nHere are your login details:\nEmail: ${email}\nTemporary Password: ${tempPassword}\n\nPlease log in and change your password as soon as possible.\n\nBest Regards,\nAscento Team`,
+    html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2 style="color: #5B67F4;">Welcome to Ascento Abacus!</h2>
         <p>Hello <strong>${name || 'Student'}</strong>,</p>
@@ -22,28 +35,18 @@ export const sendWelcomeEmail = async (email, tempPassword, name) => {
         <br/>
         <p>Best Regards,<br/><strong>Ascento Team</strong></p>
       </div>
-    `;
+    `,
+  };
 
   try {
-    if (!process.env.RESEND_API_KEY) {
-      logger.info('RESEND_API_KEY not configured. Mocking email send to: ' + email);
+    if (!process.env.SMTP_USER) {
+      logger.info('SMTP_USER not configured. Mocking email send to: ' + email);
       return { success: true, mocked: true };
     }
 
-    const { data, error } = await resend.emails.send({
-      from: `Ascento Abacus <${process.env.SMTP_FROM || 'info@ascentoabacus.com'}>`,
-      to: [email],
-      subject: 'Welcome to Ascento Abacus!',
-      html: htmlContent,
-    });
-
-    if (error) {
-      logger.error('Error sending welcome email via Resend', error);
-      throw new Error('Could not send welcome email');
-    }
-
-    logger.info('Welcome email sent via Resend: ' + data.id);
-    return { success: true, messageId: data.id };
+    const info = await transporter.sendMail(mailOptions);
+    logger.info('Welcome email sent: ' + info.messageId);
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     logger.error('Error sending welcome email', error);
     throw new Error('Could not send welcome email');
