@@ -139,9 +139,11 @@ export const createUser = async (data, file) => {
         if (newParent) {
           parentId = newParent.id;
           try {
-            await sendWelcomeEmail(data.parent_email, tempParentPassword, data.parent_name);
+            sendWelcomeEmail(data.parent_email, tempParentPassword, data.parent_name).catch(e => {
+              console.error('Failed to send parent welcome email:', e);
+            });
           } catch (e) {
-            console.error('Failed to send parent welcome email:', e);
+            console.error('Failed to initiate parent welcome email:', e);
           }
         }
       }
@@ -158,11 +160,15 @@ export const createUser = async (data, file) => {
   }
 
   // Send welcome email with temp password
-  try {
-    await sendWelcomeEmail(data.email, tempPassword, data.full_name);
-  } catch (emailError) {
-    // We log the error but don't fail the user creation
-    console.error('Failed to send welcome email:', emailError);
+  if (data.email) {
+    try {
+      sendWelcomeEmail(data.email, tempPassword, data.full_name).catch(e => {
+        console.error('Failed to send welcome email:', e);
+      });
+    } catch (emailError) {
+      // We log the error but don't fail the user creation
+      console.error('Failed to initiate welcome email:', emailError);
+    }
   }
 
   return { user, tempPassword };
