@@ -1,5 +1,5 @@
 -- CLEANUP EXISTING SCHEMA
-DROP TABLE IF EXISTS audit_logs, bulk_import_jobs, announcements, notices, notifications, payments, content_items, attendance, exam_schedule, exam_results, exams, timetable_periods, enrollments, courses, student_sections, class_subjects, subjects, sections, classes, academic_years, parent_student, users, branches CASCADE;
+DROP TABLE IF EXISTS audit_logs, bulk_import_jobs, announcements, notices, notifications, payments, content_items, attendance, exam_schedule, exam_results, exams, timetable_periods, enrollments, courses, student_sections, class_subjects, subjects, sections, classes, academic_years, parent_student, users, branches, homework, homework_submissions, meetings CASCADE;
 DROP TYPE IF EXISTS user_role, course_status, payment_status, notification_type, exam_type, day_of_week, bulk_job_status CASCADE;
 
 -- ENUMS
@@ -402,3 +402,46 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- HOMEWORK
+CREATE TABLE homework (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  file_url TEXT,
+  due_date TIMESTAMPTZ NOT NULL,
+  class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
+  section_id UUID REFERENCES sections(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
+  teacher_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE homework_submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  homework_id UUID REFERENCES homework(id) ON DELETE CASCADE,
+  student_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  file_url TEXT NOT NULL,
+  status TEXT DEFAULT 'pending', -- pending, graded, rejected
+  grade INTEGER,
+  remarks TEXT,
+  submitted_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- MEETINGS
+CREATE TABLE meetings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  meet_link TEXT NOT NULL,
+  meet_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
+  section_id UUID REFERENCES sections(id) ON DELETE CASCADE,
+  created_by UUID REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);

@@ -67,7 +67,7 @@ export const changePassword = async (authId, newPassword, userId) => {
   // Update must_change_password flag
   const { error: dbError } = await supabaseAdmin
     .from('users')
-    .update({ must_change_password: false, updated_at: new Date() })
+    .update({ must_change_password: false, updated_at: new Date().toISOString() })
     .eq('id', userId);
 
   if (dbError) {

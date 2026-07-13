@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "Ascento Student API",
+    "description": "API collection for Student access containing Homework, Content, Timetable, and Meetings.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_STUDENT_BEARER_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Homework",
+      "item": [
+        {
+          "name": "Get Homeworks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/homework?class_id=CLASS_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "homework"
+              ],
+              "query": [
+                {
+                  "key": "class_id",
+                  "value": "CLASS_ID"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Homework",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_url\": \"https://example.com/homework-submission.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/homework/HOMEWORK_ID/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "homework",
+                "HOMEWORK_ID",
+                "submit"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meetings",
+      "item": [
+        {
+          "name": "Get Meetings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/meetings?class_id=CLASS_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "meetings"
+              ],
+              "query": [
+                {
+                  "key": "class_id",
+                  "value": "CLASS_ID"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content (Notes)",
+      "item": [
+        {
+          "name": "Get Content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/content?class_id=CLASS_ID",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "class_id",
+                  "value": "CLASS_ID"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
