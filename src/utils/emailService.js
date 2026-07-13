@@ -3,11 +3,13 @@ import logger from './logger.js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const sendWelcomeEmail = async (email, tempPassword, name) => {
-  if (email.endsWith('@ascento.local')) {
+export const sendWelcomeEmail = async (email, tempPassword, name, loginEmail = null) => {
+  if (email.endsWith('@ascento.local') || email.endsWith('@student.ascento.com')) {
     logger.info('Skipping email for auto-generated local address: ' + email);
     return { success: true, mocked: true };
   }
+
+  const displayEmail = loginEmail || email;
 
   const htmlContent = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -15,7 +17,7 @@ export const sendWelcomeEmail = async (email, tempPassword, name) => {
         <p>Hello <strong>${name || 'Student'}</strong>,</p>
         <p>Your account has been successfully created. We are excited to have you on board!</p>
         <div style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 0;"><strong>Email:</strong> ${displayEmail}</p>
           <p style="margin: 0;"><strong>Temporary Password:</strong> ${tempPassword}</p>
         </div>
         <p>Please log in and navigate to your profile to change your password as soon as possible.</p>

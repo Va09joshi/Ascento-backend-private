@@ -86,7 +86,7 @@ export const createUser = async (data, file) => {
         const validRolls = existingStudents
           .map((s) => parseInt(s.roll_number, 10))
           .filter((n) => !isNaN(n));
-        
+
         const maxRoll = validRolls.length > 0 ? Math.max(...validRolls) : 0;
         rollNumber = (maxRoll + 1).toString();
       } else {
@@ -104,13 +104,9 @@ export const createUser = async (data, file) => {
 
   // 4. Link parent if provided
   let parentId = data.parent_id;
-  
+
   if (data.role === 'student' && !parentId && data.parent_email && data.parent_name) {
     try {
-      // Check if parent auth user exists by email, if not create
-      let authParentId;
-      const { data: existingUser, error: checkError } = await supabaseAdmin.auth.admin.getUserById('none').catch(() => ({ data: null })); // Dummy call, actually we can just try creating it or querying
-      
       const tempParentPassword = generateSecurePassword();
       const { data: authParent, error: authParentError } = await supabaseAdmin.auth.admin.createUser({
         email: data.parent_email,
@@ -135,7 +131,7 @@ export const createUser = async (data, file) => {
           must_change_password: true,
           created_by: data.created_by,
         }).eq('auth_id', authParent.user.id).select().single();
-        
+
         if (newParent) {
           parentId = newParent.id;
           try {
@@ -160,9 +156,11 @@ export const createUser = async (data, file) => {
   }
 
   // Send welcome email with temp password
-  if (data.email) {
+  const emailToSendTo = data.email ? data.email : (data.role === 'student' && data.parent_email ? data.parent_email : null);
+
+  if (emailToSendTo) {
     try {
-      sendWelcomeEmail(data.email, tempPassword, data.full_name).catch(e => {
+      sendWelcomeEmail(emailToSendTo, tempPassword, data.full_name, authEmail).catch(e => {
         console.error('Failed to send welcome email:', e);
       });
     } catch (emailError) {
@@ -187,7 +185,7 @@ export const listUsers = async (filters) => {
 
   const { data, error } = await query.order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
-  
+
   return data;
 };
 
@@ -204,7 +202,7 @@ export const getUserById = async (id) => {
 
 export const updateUser = async (id, data, file) => {
   let avatar_url = data.avatar_url;
-  
+
   if (file) {
     avatar_url = await uploadUserAvatar(file);
   }

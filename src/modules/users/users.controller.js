@@ -3,13 +3,13 @@ import * as userService from './users.service.js';
 export const createUser = async (req, res, next) => {
   try {
     const { user, tempPassword } = await userService.createUser({ ...req.body, created_by: req.user.id }, req.file);
-    
+
     // In production, we wouldn't return the temp password if email works
     // but useful for debugging if email queue isn't active
-    res.status(201).json({ 
-      success: true, 
-      data: { ...user, tempPassword }, 
-      message: 'User created and invite sent' 
+    res.status(201).json({
+      success: true,
+      data: { ...user, tempPassword },
+      message: 'User created and invite sent'
     });
   } catch (error) {
     next(error);
