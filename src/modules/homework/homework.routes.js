@@ -1,22 +1,20 @@
 import express from 'express';
 import * as HomeworkController from './homework.controller.js';
-import { validate } from '../../middleware/validator.js';
-import { authenticate, authorize } from '../../middleware/auth.js';
-import { createHomeworkSchema, submitHomeworkSchema, gradeHomeworkSchema } from './homework.schema.js';
+import { verifyToken, requireRole } from '../../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.use(authenticate);
+router.use(verifyToken);
 
 // List homework (everyone)
 router.get('/', HomeworkController.getHomeworks);
 
 // Teacher/Admin actions
-router.post('/', authorize('teacher', 'admin', 'super_admin'), validate(createHomeworkSchema), HomeworkController.createHomework);
-router.get('/:id/submissions', authorize('teacher', 'admin', 'super_admin'), HomeworkController.getSubmissions);
-router.patch('/submissions/:submission_id/grade', authorize('teacher', 'admin', 'super_admin'), validate(gradeHomeworkSchema), HomeworkController.gradeHomework);
+router.post('/', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.createHomework);
+router.get('/:id/submissions', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.getSubmissions);
+router.patch('/submissions/:submission_id/grade', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.gradeHomework);
 
 // Student actions
-router.post('/:id/submit', authorize('student'), validate(submitHomeworkSchema), HomeworkController.submitHomework);
+router.post('/:id/submit', requireRole('student'), HomeworkController.submitHomework);
 
 export default router;
