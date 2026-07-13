@@ -7,10 +7,18 @@ const uploadNoticeImage = async (file) => {
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `notices/${fileName}`;
 
+  let mimeType = file.mimetype;
+  if (mimeType === 'application/octet-stream' || !mimeType) {
+    if (fileExt.toLowerCase() === 'png') mimeType = 'image/png';
+    else if (fileExt.toLowerCase() === 'gif') mimeType = 'image/gif';
+    else if (fileExt.toLowerCase() === 'webp') mimeType = 'image/webp';
+    else mimeType = 'image/jpeg';
+  }
+
   const { error: uploadError } = await supabase.storage
     .from(process.env.SUPABASE_STORAGE_BUCKET)
     .upload(filePath, file.buffer, {
-      contentType: file.mimetype,
+      contentType: mimeType,
     });
 
   if (uploadError) throw new AppError(uploadError.message, 500);
