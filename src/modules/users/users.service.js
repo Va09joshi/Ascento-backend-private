@@ -10,10 +10,18 @@ const uploadUserAvatar = async (file) => {
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
   const filePath = `avatars/${fileName}`;
 
+  let mimeType = file.mimetype;
+  if (mimeType === 'application/octet-stream' || !mimeType) {
+    if (fileExt.toLowerCase() === 'png') mimeType = 'image/png';
+    else if (fileExt.toLowerCase() === 'gif') mimeType = 'image/gif';
+    else if (fileExt.toLowerCase() === 'webp') mimeType = 'image/webp';
+    else mimeType = 'image/jpeg';
+  }
+
   const { error: uploadError } = await supabaseAdmin.storage
     .from(process.env.SUPABASE_STORAGE_BUCKET)
     .upload(filePath, file.buffer, {
-      contentType: file.mimetype,
+      contentType: mimeType,
     });
 
   if (uploadError) throw new AppError(uploadError.message, 500);
@@ -63,18 +71,87 @@ export const createUser = async (data, file) => {
 
   // 3. Assign to section if student
   if (data.role === 'student' && data.section_id) {
+    let rollNumber = data.roll_number;
+
+    // Auto-generate roll number if not provided
+    if (!rollNumber) {
+      const { data: existingStudents, error: fetchError } = await supabaseAdmin
+        .from('student_sections')
+        .select('roll_number')
+        .eq('section_id', data.section_id)
+        .eq('academic_year_id', data.academic_year_id);
+
+      if (!fetchError && existingStudents) {
+        const validRolls = existingStudents
+          .map((s) => parseInt(s.roll_number, 10))
+          .filter((n) => !isNaN(n));
+        
+        const maxRoll = validRolls.length > 0 ? Math.max(...validRolls) : 0;
+        rollNumber = (maxRoll + 1).toString();
+      } else {
+        rollNumber = '1';
+      }
+    }
+
     await supabaseAdmin.from('student_sections').insert({
       student_id: user.id,
       section_id: data.section_id,
       academic_year_id: data.academic_year_id,
-      roll_number: data.roll_number,
+      roll_number: rollNumber,
     });
   }
 
   // 4. Link parent if provided
-  if (data.role === 'student' && data.parent_id) {
+  let parentId = data.parent_id;
+  
+  if (data.role === 'student' && !parentId && data.parent_email && data.parent_name) {
+    try {
+      // Check if parent auth user exists by email, if not create
+      let authParentId;
+      const { data: existingUser, error: checkError } = await supabaseAdmin.auth.admin.getUserById('none').catch(() => ({ data: null })); // Dummy call, actually we can just try creating it or querying
+      
+      const tempParentPassword = generateSecurePassword();
+      const { data: authParent, error: authParentError } = await supabaseAdmin.auth.admin.createUser({
+        email: data.parent_email,
+        password: tempParentPassword,
+        email_confirm: true,
+      });
+
+      if (authParentError) {
+        // If parent exists, find by email in users table
+        const { data: existingParent } = await supabaseAdmin.from('users').select('id').eq('email', data.parent_email).single();
+        if (existingParent) {
+          parentId = existingParent.id;
+        }
+      } else {
+        // Update new parent row
+        const { data: newParent } = await supabaseAdmin.from('users').update({
+          auth_id: authParent.user.id,
+          role: 'parent',
+          full_name: data.parent_name,
+          email: data.parent_email,
+          phone: data.parent_phone,
+          must_change_password: true,
+          created_by: data.created_by,
+        }).eq('auth_id', authParent.user.id).select().single();
+        
+        if (newParent) {
+          parentId = newParent.id;
+          try {
+            await sendWelcomeEmail(data.parent_email, tempParentPassword, data.parent_name);
+          } catch (e) {
+            console.error('Failed to send parent welcome email:', e);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Parent creation error:', err);
+    }
+  }
+
+  if (data.role === 'student' && parentId) {
     await supabaseAdmin.from('parent_student').insert({
-      parent_id: data.parent_id,
+      parent_id: parentId,
       student_id: user.id,
     });
   }
