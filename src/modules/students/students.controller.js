@@ -59,52 +59,12 @@ export const updateStudent = async (req, res, next) => {
 
     // Update academic info if provided (and only if admin)
     if (!isSelf && (req.body.section_id || req.body.academic_year_id || req.body.roll_number)) {
-      const { data: currentSection } = await supabaseAdmin
-        .from('student_sections')
-        .select('*')
-        .eq('student_id', studentId)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (currentSection) {
-        const updatePayload = {};
-        if (req.body.section_id) updatePayload.section_id = req.body.section_id;
-        if (req.body.academic_year_id) updatePayload.academic_year_id = req.body.academic_year_id;
-        if (req.body.roll_number) updatePayload.roll_number = req.body.roll_number;
-
-        await supabaseAdmin.from('student_sections')
-          .update(updatePayload)
-          .eq('student_id', studentId)
-          .eq('is_active', true);
-      } else {
-        if (req.body.section_id && req.body.academic_year_id) {
-          let rollNumber = req.body.roll_number;
-          if (!rollNumber) {
-            const { data: existingStudents } = await supabaseAdmin
-              .from('student_sections')
-              .select('roll_number')
-              .eq('section_id', req.body.section_id)
-              .eq('academic_year_id', req.body.academic_year_id);
-            
-            if (existingStudents) {
-              const validRolls = existingStudents
-                .map((s) => parseInt(s.roll_number, 10))
-                .filter((n) => !isNaN(n));
-              const maxRoll = validRolls.length > 0 ? Math.max(...validRolls) : 0;
-              rollNumber = (maxRoll + 1).toString();
-            } else {
-              rollNumber = '1';
-            }
-          }
-          await supabaseAdmin.from('student_sections').insert({
-            student_id: studentId,
-            section_id: req.body.section_id,
-            academic_year_id: req.body.academic_year_id,
-            roll_number: rollNumber,
-            is_active: true
-          });
-        }
-      }
+      await userService.assignStudentToSection(
+        studentId,
+        req.body.section_id,
+        req.body.academic_year_id,
+        req.body.roll_number
+      );
     }
 
     res.status(200).json({ success: true, data: updatedStudent, message: 'Student profile updated successfully' });

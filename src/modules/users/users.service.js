@@ -5,6 +5,61 @@ import crypto from 'crypto';
 
 import { AppError } from '../../middleware/errorHandler.js';
 
+export const assignStudentToSection = async (studentId, sectionId, academicYearId, rollNumberProvided) => {
+  if (!sectionId || !academicYearId) return null;
+  
+  const { data: currentSection } = await supabaseAdmin
+    .from('student_sections')
+    .select('*')
+    .eq('student_id', studentId)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (currentSection) {
+    const updatePayload = {};
+    if (sectionId) updatePayload.section_id = sectionId;
+    if (academicYearId) updatePayload.academic_year_id = academicYearId;
+    if (rollNumberProvided) updatePayload.roll_number = rollNumberProvided;
+
+    if (Object.keys(updatePayload).length > 0) {
+      await supabaseAdmin.from('student_sections')
+        .update(updatePayload)
+        .eq('student_id', studentId)
+        .eq('is_active', true);
+    }
+    return;
+  }
+
+  let rollNumber = rollNumberProvided;
+
+  if (!rollNumber) {
+    const { data: existingStudents, error: fetchError } = await supabaseAdmin
+      .from('student_sections')
+      .select('roll_number')
+      .eq('section_id', sectionId)
+      .eq('academic_year_id', academicYearId);
+
+    if (!fetchError && existingStudents) {
+      const validRolls = existingStudents
+        .map((s) => parseInt(s.roll_number, 10))
+        .filter((n) => !isNaN(n));
+
+      const maxRoll = validRolls.length > 0 ? Math.max(...validRolls) : 0;
+      rollNumber = (maxRoll + 1).toString();
+    } else {
+      rollNumber = '1';
+    }
+  }
+
+  await supabaseAdmin.from('student_sections').insert({
+    student_id: studentId,
+    section_id: sectionId,
+    academic_year_id: academicYearId,
+    roll_number: rollNumber,
+    is_active: true
+  });
+};
+
 const uploadUserAvatar = async (file) => {
   const fileExt = file.originalname.split('.').pop();
   const fileName = `${crypto.randomUUID()}.${fileExt}`;
@@ -72,34 +127,7 @@ export const createUser = async (data, file) => {
 
   // 3. Assign to section if student
   if (data.role === 'student' && data.section_id) {
-    let rollNumber = data.roll_number;
-
-    // Auto-generate roll number if not provided
-    if (!rollNumber) {
-      const { data: existingStudents, error: fetchError } = await supabaseAdmin
-        .from('student_sections')
-        .select('roll_number')
-        .eq('section_id', data.section_id)
-        .eq('academic_year_id', data.academic_year_id);
-
-      if (!fetchError && existingStudents) {
-        const validRolls = existingStudents
-          .map((s) => parseInt(s.roll_number, 10))
-          .filter((n) => !isNaN(n));
-
-        const maxRoll = validRolls.length > 0 ? Math.max(...validRolls) : 0;
-        rollNumber = (maxRoll + 1).toString();
-      } else {
-        rollNumber = '1';
-      }
-    }
-
-    await supabaseAdmin.from('student_sections').insert({
-      student_id: user.id,
-      section_id: data.section_id,
-      academic_year_id: data.academic_year_id,
-      roll_number: rollNumber,
-    });
+    await assignStudentToSection(user.id, data.section_id, data.academic_year_id, data.roll_number);
   }
 
   // 4. Link parent if provided
