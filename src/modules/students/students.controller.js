@@ -30,7 +30,7 @@ export const listStudents = async (req, res, next) => {
 export const getStudentById = async (req, res, next) => {
   try {
     // If asking for "my-profile", resolve ID from req.user
-    const isSelf = req.params.id === 'my-profile';
+    const isSelf = req.path === '/my-profile' || req.params.id === 'my-profile';
     const studentId = isSelf ? req.user.id : req.params.id;
 
     const student = await userService.getUserById(studentId);
@@ -47,7 +47,7 @@ export const getStudentById = async (req, res, next) => {
 
 export const updateStudent = async (req, res, next) => {
   try {
-    const isSelf = req.params.id === 'my-profile';
+    const isSelf = req.path === '/my-profile' || req.params.id === 'my-profile';
     const studentId = isSelf ? req.user.id : req.params.id;
 
     const existing = await userService.getUserById(studentId);

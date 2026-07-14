@@ -39,6 +39,9 @@ export const getSectionTimetable = async (req, res, next) => {
     const academic_year_id = req.query.academic_year_id;
     
     if (!section_id) {
+      if (req.user?.role === 'student') {
+        return res.status(200).json({ success: true, data: [] });
+      }
       return res.status(400).json({ success: false, error: { message: 'section_id is required' } });
     }
 
