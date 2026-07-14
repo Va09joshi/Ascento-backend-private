@@ -17,6 +17,7 @@ router.post(
   timetableController.createPeriod
 );
 
+router.get('/', timetableController.getSectionTimetable);
 router.get('/section/:section_id', timetableController.getSectionTimetable);
 
 router.put(
