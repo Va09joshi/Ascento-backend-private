@@ -14,6 +14,7 @@ router.post('/', requireRole('super_admin', 'admin', 'teacher'), uploadVideo.sin
 router.get('/', contentController.getContent);
 router.get('/:id/stream', contentController.getStreamUrl);
 router.patch('/:id', requireRole('super_admin', 'admin', 'teacher'), validate(schema.updateContentSchema), contentController.updateContent);
+router.put('/:id', requireRole('super_admin', 'admin', 'teacher'), validate(schema.updateContentSchema), contentController.updateContent);
 router.delete('/:id', requireRole('super_admin', 'admin', 'teacher'), auditMiddleware('DELETE_CONTENT', 'content_items'), contentController.deleteContent);
 
 export default router;

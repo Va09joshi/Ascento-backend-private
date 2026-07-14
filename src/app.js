@@ -31,6 +31,7 @@ import enquiriesRoutes from './modules/enquiries/enquiries.routes.js';
 import feesRoutes from './modules/fees/fees.routes.js';
 import homeworkRoutes from './modules/homework/homework.routes.js';
 import meetingsRoutes from './modules/meetings/meetings.routes.js';
+import uploadsRoutes from './modules/uploads/uploads.routes.js';
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use(`${API_PREFIX}/enquiries`, enquiriesRoutes);
 app.use(`${API_PREFIX}/fees`, feesRoutes);
 app.use(`${API_PREFIX}/homework`, homeworkRoutes);
 app.use(`${API_PREFIX}/meetings`, meetingsRoutes);
+app.use(`${API_PREFIX}/uploads`, uploadsRoutes);
 
 // Mock endpoints to resolve dashboard 404s temporarily
 app.get(`${API_PREFIX}/billing/history`, (req, res) => res.json({ success: true, data: [] }));

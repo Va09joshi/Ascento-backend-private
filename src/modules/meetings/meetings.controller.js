@@ -18,6 +18,15 @@ export const createMeeting = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+export const updateMeeting = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const meeting = await MeetingsService.updateMeeting(id, data);
+    res.status(200).json({ success: true, message: 'Meeting updated successfully', data: meeting });
+  } catch (error) { next(error); }
+};
+
 export const deleteMeeting = async (req, res, next) => {
   try {
     const { id } = req.params;

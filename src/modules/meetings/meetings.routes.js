@@ -11,6 +11,7 @@ router.get('/', MeetingsController.getMeetings);
 
 // Teacher/Admin actions
 router.post('/', requireRole('teacher', 'admin', 'super_admin'), MeetingsController.createMeeting);
+router.put('/:id', requireRole('teacher', 'admin', 'super_admin'), MeetingsController.updateMeeting);
 router.delete('/:id', requireRole('teacher', 'admin', 'super_admin'), MeetingsController.deleteMeeting);
 
 export default router;

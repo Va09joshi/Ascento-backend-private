@@ -3,7 +3,9 @@ import * as contentService from './content.service.js';
 export const uploadContent = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, error: { message: 'No file provided' } });
+      // Create without file (using storage_path/public_url directly from req.body)
+      const content = await contentService.createContent(req.body, req.user.id);
+      return res.status(201).json({ success: true, data: content, message: 'Content created' });
     }
     const content = await contentService.uploadContent(req.file, req.body, req.user.id);
     res.status(201).json({ success: true, data: content, message: 'Content uploaded' });

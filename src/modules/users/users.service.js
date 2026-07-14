@@ -97,7 +97,7 @@ export const createUser = async (data, file) => {
   }
 
   // 1. Create in Supabase Auth
-  const authEmail = data.email || `student_${Date.now()}@ascento.local`;
+  const authEmail = data.email || data.parent_email || `student_${Date.now()}@ascento.local`;
   const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email: authEmail,
     password: tempPassword,
@@ -118,6 +118,11 @@ export const createUser = async (data, file) => {
     date_of_birth: data.date_of_birth,
     gender: data.gender,
     address: data.address,
+    city: data.city,
+    state: data.state,
+    country: data.country,
+    qualification: data.qualification,
+    experience: data.experience,
     avatar_url: avatar_url,
     must_change_password: true,
     created_by: data.created_by,
@@ -130,63 +135,10 @@ export const createUser = async (data, file) => {
     await assignStudentToSection(user.id, data.section_id, data.academic_year_id, data.roll_number);
   }
 
-  // 4. Link parent if provided
-  let parentId = data.parent_id;
-
-  if (data.role === 'student' && !parentId && data.parent_email && data.parent_name) {
-    try {
-      const tempParentPassword = generateSecurePassword();
-      const { data: authParent, error: authParentError } = await supabaseAdmin.auth.admin.createUser({
-        email: data.parent_email,
-        password: tempParentPassword,
-        email_confirm: true,
-      });
-
-      if (authParentError) {
-        // If parent exists, find by email in users table
-        const { data: existingParent } = await supabaseAdmin.from('users').select('id').eq('email', data.parent_email).single();
-        if (existingParent) {
-          parentId = existingParent.id;
-        }
-      } else {
-        // Update new parent row
-        const { data: newParent } = await supabaseAdmin.from('users').update({
-          auth_id: authParent.user.id,
-          role: 'parent',
-          full_name: data.parent_name,
-          email: data.parent_email,
-          phone: data.parent_phone,
-          must_change_password: true,
-          created_by: data.created_by,
-        }).eq('auth_id', authParent.user.id).select().single();
-
-        if (newParent) {
-          parentId = newParent.id;
-          try {
-            sendWelcomeEmail(data.parent_email, tempParentPassword, data.parent_name).catch(e => {
-              console.error('Failed to send parent welcome email:', e);
-            });
-          } catch (e) {
-            console.error('Failed to initiate parent welcome email:', e);
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Parent creation error:', err);
-    }
-  }
-
-  if (data.role === 'student' && parentId) {
-    await supabaseAdmin.from('parent_student').insert({
-      parent_id: parentId,
-      student_id: user.id,
-    });
-  }
-
   // Send welcome email with temp password
-  const emailToSendTo = data.email ? data.email : (data.role === 'student' && data.parent_email ? data.parent_email : null);
+  const emailToSendTo = authEmail;
 
-  if (emailToSendTo) {
+  if (emailToSendTo && emailToSendTo.includes('@') && !emailToSendTo.includes('@ascento.local')) {
     try {
       sendWelcomeEmail(emailToSendTo, tempPassword, data.full_name, authEmail).catch(e => {
         console.error('Failed to send welcome email:', e);
@@ -253,7 +205,7 @@ export const updateUser = async (id, data, file) => {
     avatar_url = await uploadUserAvatar(file);
   }
 
-  const validUserKeys = ['full_name', 'email', 'phone', 'gender', 'date_of_birth', 'address', 'branch_id', 'domain_id', 'is_active', 'fcm_token'];
+  const validUserKeys = ['full_name', 'email', 'phone', 'gender', 'date_of_birth', 'address', 'city', 'state', 'country', 'qualification', 'experience', 'branch_id', 'domain_id', 'is_active', 'fcm_token'];
   const payload = {};
   
   for (const key of validUserKeys) {
@@ -280,6 +232,11 @@ export const updateUser = async (id, data, file) => {
     .single();
 
   if (error) throw new Error(error.message);
+
+  if (data.section_id) {
+    await assignStudentToSection(id, data.section_id, data.academic_year_id, data.roll_number);
+  }
+
   return user;
 };
 

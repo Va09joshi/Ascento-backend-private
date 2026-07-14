@@ -35,6 +35,19 @@ export const uploadContent = async (file, data, user_id) => {
   return content;
 };
 
+export const createContent = async (data, user_id) => {
+  const { data: content, error: dbError } = await supabaseAdmin.from('content_items').insert({
+    ...data,
+    uploaded_by: user_id,
+  }).select().single();
+
+  if (dbError) {
+    throw new Error(dbError.message);
+  }
+
+  return content;
+};
+
 export const getContent = async (filters) => {
   let query = supabaseAdmin.from('content_items').select('*').order('order_index', { ascending: true });
   if (filters.course_id) query = query.eq('course_id', filters.course_id);

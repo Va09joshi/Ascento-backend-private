@@ -27,6 +27,18 @@ export const createMeeting = async (data) => {
   return meeting;
 };
 
+export const updateMeeting = async (id, data) => {
+  const { data: meeting, error } = await supabaseAdmin
+    .from('meetings')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw new AppError(error.message, 500);
+  return meeting;
+};
+
 export const deleteMeeting = async (id, userId) => {
   // Only the creator or super_admin should delete, but we'll let supabase handle or just delete directly for now.
   const { error } = await supabaseAdmin.from('meetings').delete().eq('id', id);

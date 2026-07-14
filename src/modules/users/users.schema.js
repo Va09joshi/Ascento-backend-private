@@ -10,6 +10,11 @@ export const createUserSchema = z.object({
     date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     gender: z.enum(['male', 'female', 'other']).optional(),
     avatar_url: z.string().url().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+    qualification: z.string().optional(),
+    experience: z.number().int().optional(),
     
     // For students
     class_id: z.string().uuid().optional(),
@@ -32,10 +37,19 @@ export const updateUserSchema = z.object({
     gender: z.enum(['male', 'female', 'other']).optional(),
     date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+    qualification: z.string().optional(),
+    experience: z.number().int().optional(),
     avatar_url: z.string().url().optional(),
     branch_id: z.string().uuid().optional(),
     domain_id: z.string().uuid().optional(),
     is_active: z.boolean().optional(),
+    class_id: z.string().uuid().optional(),
+    section_id: z.string().uuid().optional(),
+    academic_year_id: z.string().uuid().optional(),
+    roll_number: z.string().optional(),
   }),
 });
 
