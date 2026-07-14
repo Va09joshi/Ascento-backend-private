@@ -238,6 +238,12 @@ export const updateUser = async (id, data, file) => {
     payload.avatar_url = avatar_url;
   }
 
+  if (Object.keys(payload).length === 0) {
+    const { data: user, error } = await supabaseAdmin.from('users').select().eq('id', id).single();
+    if (error) throw new Error(error.message);
+    return user;
+  }
+
   const { data: user, error } = await supabaseAdmin
     .from('users')
     .update(payload)
