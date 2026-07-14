@@ -173,7 +173,16 @@ export const createUser = async (data, file) => {
 };
 
 export const listUsers = async (filters) => {
-  let query = supabaseAdmin.from('users').select('*, branches(name)');
+  let query = supabaseAdmin.from('users').select(`
+    *,
+    branches(name),
+    student_sections(
+      roll_number,
+      section_id,
+      academic_year_id,
+      sections(name, classes(name))
+    )
+  `);
 
   if (filters.role) query = query.eq('role', filters.role);
   if (filters.branch_id) query = query.eq('branch_id', filters.branch_id);
@@ -192,7 +201,16 @@ export const listUsers = async (filters) => {
 export const getUserById = async (id) => {
   const { data, error } = await supabaseAdmin
     .from('users')
-    .select('*, branches(name)')
+    .select(`
+      *,
+      branches(name),
+      student_sections(
+        roll_number,
+        section_id,
+        academic_year_id,
+        sections(name, classes(name))
+      )
+    `)
     .eq('id', id)
     .single();
 
@@ -207,7 +225,15 @@ export const updateUser = async (id, data, file) => {
     avatar_url = await uploadUserAvatar(file);
   }
 
-  const payload = { ...data };
+  const validUserKeys = ['full_name', 'email', 'phone', 'gender', 'date_of_birth', 'address', 'branch_id', 'domain_id', 'is_active', 'fcm_token'];
+  const payload = {};
+  
+  for (const key of validUserKeys) {
+    if (data[key] !== undefined) {
+      payload[key] = data[key];
+    }
+  }
+
   if (avatar_url) {
     payload.avatar_url = avatar_url;
   }

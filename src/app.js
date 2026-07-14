@@ -24,6 +24,7 @@ import paymentRoutes from './modules/payments/payments.routes.js';
 import aiRoutes from './modules/ai/ai.routes.js';
 import noticesRoutes from './modules/notices/notices.routes.js';
 import teachersRoutes from './modules/teachers/teachers.routes.js';
+import studentsRoutes from './modules/students/students.routes.js';
 
 import domainsRoutes from './modules/domains/domains.routes.js';
 import enquiriesRoutes from './modules/enquiries/enquiries.routes.js';
@@ -63,6 +64,7 @@ app.use(`${API_PREFIX}/sections`, sectionRoutes);
 app.use(`${API_PREFIX}/subjects`, subjectRoutes);
 app.use(`${API_PREFIX}/admin/users`, userRoutes);
 app.use(`${API_PREFIX}/teachers`, teachersRoutes);
+app.use(`${API_PREFIX}/students`, studentsRoutes);
 app.use(`${API_PREFIX}/admin`, adminRoutes);
 app.use(`${API_PREFIX}/courses`, courseRoutes);
 app.use(`${API_PREFIX}/content`, contentRoutes);
