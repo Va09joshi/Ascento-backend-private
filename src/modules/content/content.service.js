@@ -18,8 +18,10 @@ export const uploadContent = async (file, data, user_id) => {
     .from(process.env.SUPABASE_STORAGE_BUCKET)
     .getPublicUrl(filePath);
 
+  const { description, ...dbData } = data;
+
   const { data: content, error: dbError } = await supabaseAdmin.from('content_items').insert({
-    ...data,
+    ...dbData,
     storage_path: filePath,
     public_url: publicUrlData.publicUrl,
     file_size_bytes: file.size,
@@ -36,8 +38,10 @@ export const uploadContent = async (file, data, user_id) => {
 };
 
 export const createContent = async (data, user_id) => {
+  const { description, ...dbData } = data;
+
   const { data: content, error: dbError } = await supabaseAdmin.from('content_items').insert({
-    ...data,
+    ...dbData,
     uploaded_by: user_id,
   }).select().single();
 
@@ -73,7 +77,8 @@ export const getStreamUrl = async (id) => {
 };
 
 export const updateContent = async (id, data) => {
-  const { data: content, error } = await supabaseAdmin.from('content_items').update(data).eq('id', id).select().single();
+  const { description, ...dbData } = data;
+  const { data: content, error } = await supabaseAdmin.from('content_items').update(dbData).eq('id', id).select().single();
   if (error) throw new Error(error.message);
   return content;
 };
