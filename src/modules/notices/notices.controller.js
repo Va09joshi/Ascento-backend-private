@@ -2,7 +2,8 @@ import * as noticesService from './notices.service.js';
 
 export const createNotice = async (req, res, next) => {
   try {
-    const notice = await noticesService.createNotice(req.body, req.file, req.user.id);
+    // Pass req.user.auth_id because the foreign key likely points to auth.users
+    const notice = await noticesService.createNotice(req.body, req.file, req.user.auth_id);
     res.status(201).json({ status: 'success', data: notice });
   } catch (error) {
     next(error);
