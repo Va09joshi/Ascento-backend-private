@@ -30,6 +30,21 @@ export const verifyToken = async (req, res, next) => {
       return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Account deactivated' } });
     }
 
+    if (user.role === 'student') {
+      const { data: studentSection } = await supabaseAdmin
+        .from('student_sections')
+        .select('section_id')
+        .eq('student_id', user.id)
+        .eq('is_active', true)
+        .order('joined_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (studentSection) {
+        user.section_id = studentSection.section_id;
+      }
+    }
+
     req.user = user;
     req.token = token; // Can be useful for passing to other services if needed
     next();

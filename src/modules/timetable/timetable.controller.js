@@ -35,7 +35,7 @@ export const updatePeriod = async (req, res, next) => {
 
 export const getSectionTimetable = async (req, res, next) => {
   try {
-    const section_id = req.params.section_id || req.query.section_id;
+    const section_id = req.params.section_id || req.query.section_id || req.user?.section_id;
     const academic_year_id = req.query.academic_year_id;
     
     if (!section_id) {
