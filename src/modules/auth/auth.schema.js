@@ -31,7 +31,17 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   body: z.object({
-    access_token: z.string().min(1, 'Access token is required'),
+    email: z.string().email('Invalid email format').optional(),
+    otp: z.string().optional(),
+    access_token: z.string().optional(),
     new_password: z.string().min(8, 'Password must be at least 8 characters'),
+  }),
+});
+
+export const updateProfileSchema = z.object({
+  body: z.object({
+    full_name: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
   }),
 });

@@ -1,0 +1,206 @@
+{
+  "info": {
+    "name": "Teacher API Collection",
+    "description": "Comprehensive Teacher APIs for Ascento Abacus",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth & Profile",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/me", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "auth", "me" ] }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"John Doe Updated\",\n  \"phone\": \"0987654321\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/me", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "auth", "me" ] }
+          }
+        },
+        {
+          "name": "Forgot Password (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/forgot-password", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "auth", "forgot-password" ] }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\",\n  \"new_password\": \"NewStrongP@ss1!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/reset-password", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "auth", "reset-password" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teacher Core",
+      "item": [
+        {
+          "name": "Get Teacher Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/teachers/dashboard", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "teachers", "dashboard" ] }
+          }
+        },
+        {
+          "name": "Get Students List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/students?section_id=your_section_id", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "students" ], "query": [ { "key": "section_id", "value": "your_section_id" } ] }
+          }
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/students/:id", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "students", ":id" ], "variable": [ { "key": "id", "value": "student_id" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Homework",
+      "item": [
+        {
+          "name": "Assign Homework",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Math Worksheet 1\",\n  \"description\": \"Complete pages 1-5\",\n  \"section_id\": \"uuid\",\n  \"subject_id\": \"uuid\",\n  \"due_date\": \"2023-12-31\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/homework", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "homework" ] }
+          }
+        },
+        {
+          "name": "Get Homework Submissions",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/homework/:id/submissions", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "homework", ":id", "submissions" ], "variable": [ { "key": "id", "value": "homework_id" } ] }
+          }
+        },
+        {
+          "name": "Grade Homework",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grade\": \"A\",\n  \"feedback\": \"Good job!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/homework/submissions/:submission_id/grade", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "homework", "submissions", ":submission_id", "grade" ], "variable": [ { "key": "submission_id", "value": "sub_id" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Mark Student Attendance",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"section_id\": \"uuid\",\n  \"subject_id\": \"uuid\",\n  \"date\": \"2023-10-25\",\n  \"records\": [\n    {\n      \"student_id\": \"uuid1\",\n      \"present\": true,\n      \"late\": false\n    },\n    {\n      \"student_id\": \"uuid2\",\n      \"present\": false\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/attendance/bulk", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "attendance", "bulk" ] }
+          }
+        },
+        {
+          "name": "Get Teacher Own Attendance",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/attendance/teacher/my", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "attendance", "teacher", "my" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timetable",
+      "item": [
+        {
+          "name": "View Section Timetable",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/api/v1/timetable/section/:section_id", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "timetable", "section", ":section_id" ], "variable": [ { "key": "section_id", "value": "section_id" } ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meetings",
+      "item": [
+        {
+          "name": "Create Meeting",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Parent Teacher Conference\",\n  \"description\": \"Monthly sync\",\n  \"section_id\": \"uuid\",\n  \"start_time\": \"2023-11-01T10:00:00Z\",\n  \"end_time\": \"2023-11-01T11:00:00Z\",\n  \"meeting_url\": \"https://zoom.us/j/12345\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/meetings", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "meetings" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Upload Content",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Chapter 1 Video", "type": "text" },
+                { "key": "description", "value": "Introduction", "type": "text" },
+                { "key": "section_id", "value": "uuid", "type": "text" },
+                { "key": "subject_id", "value": "uuid", "type": "text" },
+                { "key": "file", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/content", "host": [ "{{baseUrl}}" ], "path": [ "api", "v1", "content" ] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "your_jwt_token_here", "type": "string" }
+  ]
+}

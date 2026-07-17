@@ -9,8 +9,6 @@ import * as schema from './teachers.schema.js';
 const router = Router();
 
 router.use(verifyToken);
-// Only super_admin and admin can manage teachers
-router.use(requireRole('super_admin', 'admin'));
 
 // Middleware to parse form-data strings to boolean for teachers
 const parseTeacherForm = (req, res, next) => {
@@ -24,6 +22,7 @@ const parseTeacherForm = (req, res, next) => {
 
 router.post(
   '/',
+  requireRole('super_admin', 'admin'),
   uploadMemory.single('avatar'),
   parseTeacherForm,
   validate(schema.createTeacherSchema),
@@ -31,11 +30,13 @@ router.post(
   teacherController.createTeacher
 );
 
-router.get('/', teacherController.listTeachers);
-router.get('/:id', teacherController.getTeacherById);
+router.get('/', requireRole('super_admin', 'admin'), teacherController.listTeachers);
+router.get('/dashboard', requireRole('super_admin', 'admin', 'teacher'), teacherController.getDashboardStats);
+router.get('/:id', requireRole('super_admin', 'admin', 'teacher'), teacherController.getTeacherById);
 
 router.patch(
   '/:id',
+  requireRole('super_admin', 'admin'),
   uploadMemory.single('avatar'),
   parseTeacherForm,
   validate(schema.updateTeacherSchema),
@@ -45,6 +46,7 @@ router.patch(
 
 router.delete(
   '/:id',
+  requireRole('super_admin', 'admin'),
   auditMiddleware('DEACTIVATE_TEACHER', 'users'),
   teacherController.deactivateTeacher
 );

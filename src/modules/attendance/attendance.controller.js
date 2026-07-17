@@ -46,3 +46,28 @@ export const getAttendanceReport = async (req, res, next) => {
     percentage: 93.3
   });
 };
+
+export const markTeacherAttendance = async (req, res, next) => {
+  try {
+    // Stub implementation
+    res.status(201).json({ success: true, data: req.body.records, message: 'Teacher attendance marked' });
+  } catch (error) { next(error); }
+};
+
+export const getTeacherAttendanceSheet = async (req, res, next) => {
+  try {
+    const { date } = req.query;
+    if (!date) {
+      return res.status(400).json({ success: false, error: { message: 'Missing date parameter' } });
+    }
+    // Stub implementation
+    res.status(200).json({ success: true, data: [] });
+  } catch (error) { next(error); }
+};
+
+export const getTeacherSummary = async (req, res, next) => {
+  try {
+    // Stub implementation
+    res.status(200).json({ success: true, data: { total_days: 30, present_days: 28, percentage: 93 } });
+  } catch (error) { next(error); }
+};

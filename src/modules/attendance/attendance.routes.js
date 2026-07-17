@@ -14,4 +14,9 @@ router.get('/sheet', requireRole('super_admin', 'admin', 'teacher'), attendanceC
 router.get('/student/:id', attendanceController.getStudentSummary);
 router.get('/report', attendanceController.getAttendanceReport);
 
+// Teacher attendance routes
+router.post('/teacher/bulk', requireRole('super_admin', 'admin'), validate(schema.markTeacherAttendanceSchema), auditMiddleware('MARK_TEACHER_ATTENDANCE', 'attendance'), attendanceController.markTeacherAttendance);
+router.get('/teacher/sheet', requireRole('super_admin', 'admin'), attendanceController.getTeacherAttendanceSheet);
+router.get('/teacher/:id', requireRole('super_admin', 'admin', 'teacher'), attendanceController.getTeacherSummary);
+
 export default router;

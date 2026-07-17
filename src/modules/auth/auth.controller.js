@@ -71,3 +71,44 @@ export const getMe = async (req, res, next) => {
     message: 'User profile retrieved successfully',
   });
 };
+
+export const updateMe = async (req, res, next) => {
+  try {
+    const updatedUser = await authService.updateProfile(req.user.id, req.body);
+    res.status(200).json({
+      success: true,
+      data: updatedUser,
+      message: 'Profile updated successfully',
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: { code: 'UPDATE_FAILED', message: error.message } });
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    await authService.forgotPassword(req.body.email);
+    res.status(200).json({
+      success: true,
+      message: 'If the email exists, a reset code has been sent.',
+    });
+  } catch (error) {
+    // Return 200 to prevent email enumeration, but log the error
+    res.status(200).json({
+      success: true,
+      message: 'If the email exists, a reset code has been sent.',
+    });
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    await authService.resetPassword(req.body);
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully',
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, error: { code: 'RESET_FAILED', message: error.message } });
+  }
+};

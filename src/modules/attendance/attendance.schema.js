@@ -16,3 +16,17 @@ export const markAttendanceSchema = z.object({
     ).min(1),
   }),
 });
+
+export const markTeacherAttendanceSchema = z.object({
+  body: z.object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    records: z.array(
+      z.object({
+        teacher_id: z.string().uuid(),
+        present: z.boolean(),
+        late: z.boolean().optional(),
+        remarks: z.string().optional(),
+      })
+    ).min(1),
+  }),
+});

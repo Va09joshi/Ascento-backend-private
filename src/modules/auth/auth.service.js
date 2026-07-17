@@ -80,3 +80,49 @@ export const logout = async (token) => {
   const { error } = await supabaseAdmin.auth.admin.signOut(token);
   if (error) throw new Error(error.message);
 };
+
+export const updateProfile = async (userId, updateData) => {
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update({ ...updateData, updated_at: new Date().toISOString() })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+export const forgotPassword = async (email) => {
+  // Uses Supabase's built-in reset password email (sends magic link or OTP depending on settings)
+  const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email);
+  if (error) {
+    logger.error('Forgot password error', { error: error.message });
+    throw new Error(error.message);
+  }
+};
+
+export const resetPassword = async ({ email, otp, access_token, new_password }) => {
+  if (otp && email) {
+    // Verify OTP first
+    const { data, error } = await supabaseAdmin.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'recovery',
+    });
+    if (error) throw new Error(error.message);
+    
+    // Once verified, we can update the user password
+    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
+      password: new_password
+    });
+    if (updateError) throw new Error(updateError.message);
+  } else if (access_token) {
+    // If using PKCE link, the client will have an access token
+    // We would need to pass this access_token in headers, or update using admin API if we resolve the user
+    // However, usually the client updates password directly with Supabase using supabase.auth.updateUser()
+    throw new Error('Access token flow not fully implemented in backend. Use OTP flow or direct Supabase client call.');
+  } else {
+    throw new Error('Either OTP and Email, or Access Token must be provided');
+  }
+};

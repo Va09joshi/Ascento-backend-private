@@ -21,6 +21,10 @@ router.post(
   authController.changePassword
 );
 
+router.post('/forgot-password', authRateLimit, validate(schema.forgotPasswordSchema), authController.forgotPassword);
+router.post('/reset-password', authRateLimit, validate(schema.resetPasswordSchema), authController.resetPassword);
+
 router.get('/me', verifyToken, requirePasswordChanged, authController.getMe);
+router.patch('/me', verifyToken, validate(schema.updateProfileSchema), authController.updateMe);
 
 export default router;

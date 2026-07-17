@@ -63,3 +63,22 @@ export const deactivateTeacher = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDashboardStats = async (req, res, next) => {
+  try {
+    // Stub implementation for teacher dashboard metrics
+    res.status(200).json({
+      success: true,
+      data: {
+        total_students: 120,
+        pending_homework: 5,
+        upcoming_meetings: 2,
+        unread_notices: 3,
+        recent_activities: []
+      },
+      message: 'Dashboard stats retrieved successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
