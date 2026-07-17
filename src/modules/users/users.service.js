@@ -123,6 +123,7 @@ export const createUser = async (data, file) => {
     country: data.country,
     qualification: data.qualification,
     experience: data.experience,
+    is_active: data.is_active !== undefined ? data.is_active : true,
     avatar_url: avatar_url,
     must_change_password: true,
     created_by: data.created_by,

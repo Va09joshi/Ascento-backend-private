@@ -14,7 +14,8 @@ export const createUserSchema = z.object({
     state: z.string().optional(),
     country: z.string().optional(),
     qualification: z.string().optional(),
-    experience: z.number().int().optional(),
+    experience: z.coerce.number().int().optional(),
+    is_active: z.preprocess((val) => val === 'true' || val === true, z.boolean()).optional(),
     
     // For students
     class_id: z.string().uuid().optional(),
@@ -41,11 +42,11 @@ export const updateUserSchema = z.object({
     state: z.string().optional(),
     country: z.string().optional(),
     qualification: z.string().optional(),
-    experience: z.number().int().optional(),
+    experience: z.coerce.number().int().optional(),
     avatar_url: z.string().url().optional(),
     branch_id: z.string().uuid().optional(),
     domain_id: z.string().uuid().optional(),
-    is_active: z.boolean().optional(),
+    is_active: z.preprocess((val) => val === 'true' || val === true, z.boolean()).optional(),
     class_id: z.string().uuid().optional(),
     section_id: z.string().uuid().optional(),
     academic_year_id: z.string().uuid().optional(),
