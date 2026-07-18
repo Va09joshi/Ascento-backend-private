@@ -32,6 +32,7 @@ router.post(
 
 router.get('/', requireRole('super_admin', 'admin'), teacherController.listTeachers);
 router.get('/dashboard', requireRole('super_admin', 'admin', 'teacher'), teacherController.getDashboardStats);
+router.get('/my-students', requireRole('teacher'), teacherController.getMyStudentsBySection);
 router.get('/:id', requireRole('super_admin', 'admin', 'teacher'), teacherController.getTeacherById);
 
 router.patch(
