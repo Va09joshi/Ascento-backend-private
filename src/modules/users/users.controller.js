@@ -45,8 +45,8 @@ export const updateUser = async (req, res, next) => {
 
 export const deactivateUser = async (req, res, next) => {
   try {
-    await userService.updateUser(req.params.id, { is_active: false });
-    res.status(200).json({ success: true, message: 'User deactivated successfully' });
+    await userService.deleteUser(req.params.id);
+    res.status(200).json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
     next(error);
   }

@@ -245,3 +245,46 @@ export const linkParent = async (data) => {
   const { error } = await supabaseAdmin.from('parent_student').insert(data);
   if (error) throw new Error(error.message);
 };
+
+export const deleteUser = async (id) => {
+  const { data: user, error: fetchError } = await supabaseAdmin
+    .from('users')
+    .select('auth_id, email')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) throw new AppError(fetchError.message, 404);
+
+  if (user && user.auth_id) {
+    // Delete from Supabase Auth (frees up the email)
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(user.auth_id);
+    if (authError) {
+      // If user was already deleted manually in Auth, we can safely ignore the error and proceed to delete from DB
+      if (authError.message?.toLowerCase().includes('not found') || authError.status === 404) {
+        // Ignore and proceed to DB delete
+      } else {
+        // Fallback: Soft delete and rename email to free it up
+        const fakeEmail = `deleted_${Date.now()}_${user.email}`;
+        try {
+          await supabaseAdmin.auth.admin.updateUserById(user.auth_id, { email: fakeEmail });
+        } catch (e) {
+          // ignore auth update errors on fallback
+        }
+        await supabaseAdmin.from('users').update({ is_active: false, email: fakeEmail }).eq('id', id);
+        return;
+      }
+    }
+  }
+
+  // Hard delete from public.users table (might be handled by cascade from auth.users, but we do it to be safe)
+  const { error: dbError } = await supabaseAdmin
+    .from('users')
+    .delete()
+    .eq('id', id);
+
+  if (dbError) {
+    // If there's a foreign key constraint error, we fallback to soft delete
+    const fakeEmail = `deleted_${Date.now()}_${user.email}`;
+    await supabaseAdmin.from('users').update({ is_active: false, email: fakeEmail }).eq('id', id);
+  }
+};
