@@ -266,7 +266,7 @@ export const deleteUser = async (id) => {
         // Fallback: Soft delete and rename email to free it up
         const fakeEmail = `deleted_${Date.now()}_${user.email}`;
         try {
-          await supabaseAdmin.auth.admin.updateUserById(user.auth_id, { email: fakeEmail });
+          await supabaseAdmin.auth.admin.updateUserById(user.auth_id, { email: fakeEmail, email_confirm: true, user_metadata: { deleted: true } });
         } catch (e) {
           // ignore auth update errors on fallback
         }
