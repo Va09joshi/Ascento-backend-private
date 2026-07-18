@@ -64,6 +64,30 @@ export const getSectionTimetable = async (req, res, next) => {
   }
 };
 
+export const getTeacherTimetable = async (req, res, next) => {
+  try {
+    const teacher_id = req.user.id;
+    const academic_year_id = req.query.academic_year_id;
+    
+    const cacheKey = `timetable:teacher:${teacher_id}${academic_year_id ? `:${academic_year_id}` : ''}`;
+    
+    // Try cache first
+    const cached = await redisConnection.get(cacheKey);
+    if (cached) {
+      return res.status(200).json({ success: true, data: JSON.parse(cached), source: 'cache' });
+    }
+
+    const timetable = await timetableService.getTeacherTimetable(teacher_id, academic_year_id);
+    
+    // Cache for 1 hour
+    await redisConnection.setex(cacheKey, 3600, JSON.stringify(timetable));
+    
+    res.status(200).json({ success: true, data: timetable });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deletePeriod = async (req, res, next) => {
   try {
     // In a real scenario, we'd fetch the period first to know which section cache to invalidate

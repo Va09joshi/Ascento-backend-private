@@ -55,6 +55,25 @@ export const getSectionTimetable = async (section_id, academic_year_id) => {
   return data;
 };
 
+export const getTeacherTimetable = async (teacher_id, academic_year_id) => {
+  let query = supabaseAdmin
+    .from('timetable_periods')
+    .select(`
+      *,
+      subjects(name, code),
+      sections(name, classes(name))
+    `)
+    .eq('teacher_id', teacher_id);
+    
+  if (academic_year_id) {
+    query = query.eq('academic_year_id', academic_year_id);
+  }
+
+  const { data, error } = await query.order('start_time', { ascending: true });
+  if (error) throw new Error(error.message);
+  return data;
+};
+
 export const deletePeriod = async (id) => {
   const { error } = await supabaseAdmin.from('timetable_periods').delete().eq('id', id);
   if (error) throw new Error(error.message);
