@@ -61,12 +61,12 @@ export const deleteSection = async (id) => {
 export const getSectionStudents = async (id) => {
   const { data, error } = await supabaseAdmin
     .from('student_sections')
-    .select('*, users(*)')
+    .select('users(*)')
     .eq('section_id', id)
     .eq('is_active', true);
 
   if (error) throw new Error(error.message);
-  return data;
+  return data.map(item => item.users);
 };
 
 export const assignTeacher = async (id, teacher_id) => {

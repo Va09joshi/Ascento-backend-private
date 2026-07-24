@@ -15,6 +15,20 @@ export const getHomeworks = async (filters) => {
 };
 
 export const createHomework = async (data) => {
+  // Enforce teacher assignment
+  const { data: timetable, error: ttError } = await supabaseAdmin
+    .from('timetable')
+    .select('id')
+    .eq('teacher_id', data.teacher_id)
+    .eq('class_id', data.class_id)
+    .eq('section_id', data.section_id)
+    .limit(1);
+
+  if (ttError) throw new AppError(ttError.message, 500);
+  if (!timetable || timetable.length === 0) {
+    throw new AppError('You are not assigned to this class and section.', 403);
+  }
+
   const { data: homework, error } = await supabaseAdmin
     .from('homework')
     .insert([data])

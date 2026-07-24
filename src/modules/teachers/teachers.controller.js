@@ -165,7 +165,7 @@ export const getMyStudentsBySection = async (req, res, next) => {
       .select(`
         id,
         name,
-        classes ( name ),
+        classes ( id, name ),
         student_sections (
           roll_number,
           users ( id, full_name, email, avatar_url, phone )
@@ -183,6 +183,7 @@ export const getMyStudentsBySection = async (req, res, next) => {
     const formattedData = sectionsData.map(section => ({
       section_id: section.id,
       section_name: section.name,
+      class_id: section.classes?.id,
       class_name: section.classes?.name,
       students: (section.student_sections || []).map(ss => ({
         student_id: ss.users?.id,
