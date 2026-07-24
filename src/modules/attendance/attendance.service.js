@@ -16,7 +16,7 @@ export const markBulkAttendance = async (data, marked_by) => {
   }));
 
   const { data: attendance, error } = await supabaseAdmin.from('attendance')
-    .upsert(formattedRecords, { onConflict: 'student_id, section_id, subject_id, date' })
+    .upsert(formattedRecords, { onConflict: 'student_id, section_id, date' })
     .select();
 
   if (error) throw new Error(error.message);
