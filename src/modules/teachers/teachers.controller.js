@@ -3,8 +3,8 @@ import * as userService from '../users/users.service.js';
 
 export const createTeacher = async (req, res, next) => {
   try {
-    const data = { ...req.body, role: 'teacher' };
-    const { user, tempPassword } = await userService.createUser(data, req.user?.email);
+    const data = { ...req.body, role: 'teacher', created_by: req.user.id };
+    const { user, tempPassword } = await userService.createUser(data, req.file);
     res.status(201).json({
       success: true,
       data: user,
