@@ -11,6 +11,7 @@ router.get('/', HomeworkController.getHomeworks);
 
 // Teacher/Admin actions
 router.post('/', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.createHomework);
+router.delete('/:id', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.deleteHomework);
 router.get('/:id/submissions', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.getSubmissions);
 router.patch('/submissions/:submission_id/grade', requireRole('teacher', 'admin', 'super_admin'), HomeworkController.gradeHomework);
 

@@ -20,6 +20,14 @@ export const createHomework = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+export const deleteHomework = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await HomeworkService.deleteHomework(id, req.user.id);
+    res.status(200).json({ success: true, message: 'Homework deleted successfully' });
+  } catch (error) { next(error); }
+};
+
 export const getSubmissions = async (req, res, next) => {
   try {
     const { id } = req.params;
