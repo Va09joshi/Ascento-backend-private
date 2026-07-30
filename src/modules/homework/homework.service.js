@@ -15,7 +15,7 @@ export const getHomeworks = async (filters) => {
 };
 
 export const createHomework = async (data) => {
-  // Enforce teacher assignment via sections table
+  // Enforce teacher assignment via sections or timetable
   const { data: section, error: secError } = await supabaseAdmin
     .from('sections')
     .select('id')
@@ -23,8 +23,17 @@ export const createHomework = async (data) => {
     .eq('teacher_id', data.teacher_id)
     .limit(1);
 
+  const { data: ttPeriod, error: ttError } = await supabaseAdmin
+    .from('timetable_periods')
+    .select('id')
+    .eq('section_id', data.section_id)
+    .eq('teacher_id', data.teacher_id)
+    .limit(1);
+
   if (secError) throw new AppError(secError.message, 500);
-  if (!section || section.length === 0) {
+  if (ttError) throw new AppError(ttError.message, 500);
+  
+  if ((!section || section.length === 0) && (!ttPeriod || ttPeriod.length === 0)) {
     throw new AppError('You are not assigned to this class and section.', 403);
   }
 
