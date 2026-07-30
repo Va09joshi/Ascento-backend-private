@@ -44,14 +44,16 @@ export const getAttendanceSheet = async (section_id, subject_id, date) => {
 };
 
 export const getStudentSummary = async (student_id) => {
-  const { data, error } = await supabaseAdmin.from('attendance').select('present').eq('student_id', student_id);
+  const { data, error } = await supabaseAdmin.from('attendance').select('present, late').eq('student_id', student_id);
   if (error) throw new Error(error.message);
   
   const total = data.length;
   const present = data.filter(d => d.present).length;
+  const late = data.filter(d => d.late).length;
+  const absent = total - present;
   const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
   
-  return { total_days: total, present_days: present, percentage };
+  return { total_days: total, present_days: present, absent_days: absent, late_days: late, percentage };
 };
 
 export const getMonthlyAttendance = async (student_id, month, year) => {

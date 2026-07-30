@@ -41,15 +41,21 @@ export const getMonthlyAttendance = async (req, res, next) => {
 };
 
 export const getAttendanceReport = async (req, res, next) => {
-  // Stub endpoint to resolve 404s for dashboard and provide valid summary
-  res.status(200).json({
-    totalDays: 45,
-    presentDays: 42,
-    absentDays: 3,
-    lateDays: 0,
-    holidays: 2,
-    percentage: 93.3
-  });
+  try {
+    const student_id = req.user.id;
+    const summary = await attendanceService.getStudentSummary(student_id);
+    res.status(200).json({
+      success: true,
+      data: {
+        totalDays: summary.total_days,
+        presentDays: summary.present_days,
+        absentDays: summary.absent_days,
+        lateDays: summary.late_days,
+        holidays: 0,
+        percentage: summary.percentage
+      }
+    });
+  } catch (error) { next(error); }
 };
 
 export const markTeacherAttendance = async (req, res, next) => {
