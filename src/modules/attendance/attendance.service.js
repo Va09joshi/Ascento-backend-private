@@ -28,7 +28,7 @@ export const markBulkAttendance = async (data, marked_by) => {
 
 export const getAttendanceSheet = async (section_id, subject_id, date) => {
   let query = supabaseAdmin.from('attendance')
-    .select('*, users!student_id(full_name, roll_number)')
+    .select('*, users!student_id(full_name)')
     .eq('section_id', section_id)
     .eq('date', date);
     
