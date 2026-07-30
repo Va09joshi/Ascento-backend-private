@@ -29,9 +29,12 @@ export const getStudentSummary = async (req, res, next) => {
 export const getMonthlyAttendance = async (req, res, next) => {
   try {
     const student_id = ['super_admin', 'admin', 'teacher'].includes(req.user.role) && req.query.student_id ? req.query.student_id : req.user.id;
-    // For now return an empty array until the service method is fully implemented
-    // Or you could query attendance table by month/year here
-    res.status(200).json({ success: true, data: [] });
+    const { month, year } = req.query;
+    if (!month || !year) {
+      return res.status(400).json({ success: false, error: { message: 'Missing month or year parameter' } });
+    }
+    const data = await attendanceService.getMonthlyAttendance(student_id, parseInt(month, 10), parseInt(year, 10));
+    res.status(200).json({ success: true, data });
   } catch (error) { next(error); }
 };
 

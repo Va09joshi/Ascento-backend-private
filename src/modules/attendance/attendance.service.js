@@ -47,3 +47,18 @@ export const getStudentSummary = async (student_id) => {
   
   return { total_days: total, present_days: present, percentage };
 };
+
+export const getMonthlyAttendance = async (student_id, month, year) => {
+  const monthStr = month.toString().padStart(2, '0');
+  const startDate = `${year}-${monthStr}-01`;
+  const endDate = new Date(year, month, 0).toISOString().split('T')[0];
+  
+  const { data, error } = await supabaseAdmin.from('attendance')
+    .select('*')
+    .eq('student_id', student_id)
+    .gte('date', startDate)
+    .lte('date', endDate);
+
+  if (error) throw new Error(error.message);
+  return data;
+};

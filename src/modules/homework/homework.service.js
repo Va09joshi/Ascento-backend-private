@@ -1,16 +1,44 @@
 import { supabaseAdmin } from '../../config/supabase.js';
 import { AppError } from '../../middleware/errorHandler.js';
 
-export const getHomeworks = async (filters) => {
-  let query = supabaseAdmin.from('homework').select('*, subjects(name), classes(name), sections(name)');
+export const getHomeworks = async (filters, studentId = null) => {
+  let query = supabaseAdmin.from('homework').select(`
+    *, 
+    subjects(name), 
+    classes(name), 
+    sections(name)
+    ${studentId ? ', homework_submissions(*)' : ''}
+  `);
   
   if (filters.class_id) query = query.eq('class_id', filters.class_id);
   if (filters.section_id) query = query.eq('section_id', filters.section_id);
   if (filters.subject_id) query = query.eq('subject_id', filters.subject_id);
   if (filters.teacher_id) query = query.eq('teacher_id', filters.teacher_id);
   
+  if (studentId) {
+    query = query.eq('homework_submissions.student_id', studentId);
+  }
+  
   const { data, error } = await query.order('due_date', { ascending: true });
   if (error) throw new AppError(error.message, 500);
+  
+  // Format the response so that the student's submission dictates the status
+  if (studentId && data) {
+    return data.map(hw => {
+      const submissions = hw.homework_submissions || [];
+      // Because we filtered by student_id in the join, there should be at most 1
+      const mySubmission = submissions.find(s => s.student_id === studentId);
+      
+      return {
+        ...hw,
+        status: mySubmission ? mySubmission.status : 'pending',
+        submissionUrl: mySubmission ? mySubmission.file_url : null,
+        marks: mySubmission ? mySubmission.grade : null,
+        remarks: mySubmission ? mySubmission.remarks : null,
+      };
+    });
+  }
+  
   return data;
 };
 

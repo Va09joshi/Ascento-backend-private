@@ -4,8 +4,10 @@ export const getHomeworks = async (req, res, next) => {
   try {
     const { class_id, section_id, subject_id, teacher_id } = req.query;
     const filters = { class_id, section_id, subject_id, teacher_id };
+    const isStaff = ['super_admin', 'admin', 'teacher'].includes(req.user.role);
+    const studentId = !isStaff ? req.user.id : null;
     
-    const homeworks = await HomeworkService.getHomeworks(filters);
+    const homeworks = await HomeworkService.getHomeworks(filters, studentId);
     res.status(200).json({ success: true, message: 'Homework fetched successfully', data: homeworks });
   } catch (error) { next(error); }
 };
