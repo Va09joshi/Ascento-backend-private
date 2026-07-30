@@ -27,12 +27,18 @@ export const markBulkAttendance = async (data, marked_by) => {
 };
 
 export const getAttendanceSheet = async (section_id, subject_id, date) => {
-  const { data, error } = await supabaseAdmin.from('attendance')
+  let query = supabaseAdmin.from('attendance')
     .select('*, users!student_id(full_name, roll_number)')
     .eq('section_id', section_id)
-    .eq('subject_id', subject_id)
     .eq('date', date);
+    
+  if (subject_id) {
+    query = query.eq('subject_id', subject_id);
+  } else {
+    query = query.is('subject_id', null);
+  }
 
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return data;
 };

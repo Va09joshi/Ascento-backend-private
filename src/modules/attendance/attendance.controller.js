@@ -9,11 +9,13 @@ export const markBulkAttendance = async (req, res, next) => {
 
 export const getAttendanceSheet = async (req, res, next) => {
   try {
-    const { section_id, subject_id, date } = req.query;
-    if (!section_id || !subject_id || !date) {
-      return res.status(400).json({ success: false, error: { message: 'Missing parameters' } });
+    const { section_id, subject_id, date, start_date } = req.query;
+    const targetDate = date || start_date;
+    
+    if (!section_id || !targetDate) {
+      return res.status(400).json({ success: false, error: { message: 'Missing section_id or date parameters' } });
     }
-    const sheet = await attendanceService.getAttendanceSheet(section_id, subject_id, date);
+    const sheet = await attendanceService.getAttendanceSheet(section_id, subject_id, targetDate);
     res.status(200).json({ success: true, data: sheet });
   } catch (error) { next(error); }
 };
