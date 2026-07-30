@@ -98,7 +98,7 @@ export const submitHomework = async (homeworkId, studentId, fileUrl) => {
     // Update existing submission
     const { data, error } = await supabaseAdmin
       .from('homework_submissions')
-      .update({ file_url: fileUrl, status: 'pending', submitted_at: new Date() })
+      .update({ file_url: fileUrl, status: 'submitted', submitted_at: new Date() })
       .eq('id', existing.id)
       .select()
       .single();
@@ -109,7 +109,7 @@ export const submitHomework = async (homeworkId, studentId, fileUrl) => {
   
   const { data, error } = await supabaseAdmin
     .from('homework_submissions')
-    .insert([{ homework_id: homeworkId, student_id: studentId, file_url: fileUrl, status: 'pending' }])
+    .insert([{ homework_id: homeworkId, student_id: studentId, file_url: fileUrl, status: 'submitted' }])
     .select()
     .single();
     
